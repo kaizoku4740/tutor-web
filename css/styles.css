@@ -1,0 +1,64 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+:root{
+  --bg:#f6fbff;
+  --card:#ffffff;
+  --accent:#0b74de; /* primary */
+  --accent-2:#2c7a7b; /* secondary */
+  --muted:#61707a;
+  --radius:12px;
+  --max-width:1100px;
+}
+
+*{box-sizing:border-box}
+body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin:0; background:var(--bg); color:#071024; -webkit-font-smoothing:antialiased}
+.container{max-width:var(--max-width); margin:0 auto; padding:1.25rem}
+
+.site-header{background:transparent; position:sticky; top:0; backdrop-filter: blur(6px);}
+.site-header .container{display:flex; align-items:center; gap:1rem}
+.brand{font-weight:700; text-decoration:none; color:var(--accent); font-size:1.1rem}
+.main-nav{margin-left:auto; display:flex; gap:.5rem; align-items:center}
+.main-nav a{color:inherit; text-decoration:none; padding:.5rem .75rem; border-radius:8px; font-weight:600}
+.main-nav a:hover{background:rgba(11,116,222,0.08)}
+.nav-toggle{display:none; background:none; border:0; font-size:1.35rem}
+
+.hero{padding:4rem 0}
+.hero .hero-inner{display:grid; grid-template-columns:1fr 360px; gap:2rem; align-items:center}
+.hero h1{font-size:2rem; margin:.25rem 0; line-height:1.05}
+.hero p.lead{color:var(--muted); margin-top:.5rem}
+
+.hero-card{background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.85)); padding:1.25rem; border-radius:14px; box-shadow:0 10px 30px rgba(2,6,23,0.07)}
+
+.features{display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin:2rem 0 3rem}
+.features article{background:var(--card); padding:1rem; border-radius:var(--radius); box-shadow:0 6px 18px rgba(2,6,23,0.06)}
+
+.site-footer{padding:1.25rem 0; color:var(--muted)}
+.btn{background:var(--accent); color:white; padding:.6rem 1rem; border-radius:10px; text-decoration:none; display:inline-block; font-weight:600}
+.btn.secondary{background:var(--accent-2)}
+
+.contact-form{max-width:640px}
+.contact-form label{display:block; margin-bottom:.75rem}
+.contact-form input, .contact-form textarea, .contact-form select{width:100%; padding:.6rem; border-radius:8px; border:1px solid #e6eef6}
+.actions{margin-top:.5rem}
+.form-status{color:var(--muted); margin-top:.75rem}
+
+.profile-card{background:var(--card); padding:1rem; border-radius:12px; display:flex; gap:1rem; align-items:center; box-shadow:0 8px 24px rgba(2,6,23,0.06)}
+.avatar{width:84px; height:84px; border-radius:999px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:1.4rem}
+
+.rating{color:#f6b042; font-weight:700}
+.reviews .card{background:var(--card); padding:0.75rem; border-radius:10px; box-shadow:0 6px 20px rgba(2,6,23,0.04); margin-bottom:.75rem}
+
+@media (max-width:900px){
+  .hero .hero-inner{grid-template-columns:1fr}
+  .nav-toggle{display:block}
+  .main-nav{position:absolute; right:1rem; top:72px; background:var(--card); padding:.5rem; border-radius:8px; display:none; box-shadow:0 8px 30px rgba(2,6,23,0.08)}
+  .main-nav.show{display:flex; flex-direction:column}
+  .features{grid-template-columns:1fr}
+}
+
+/* reveal animation for cards */
+.reveal{animation:fadeInUp .45s ease both}
+@keyframes fadeInUp{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)}}
+
+

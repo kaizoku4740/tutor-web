@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>MathByMsGarg - Home</title>
+    <meta name="description" content="Math tutoring by Ms. Garg — personalized lessons for algebra, calculus, and competition prep.">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="brand" href="index.html">MathByMsGarg</a>
+        <button id="nav-toggle" class="nav-toggle">☰</button>
+        <nav id="main-nav" class="main-nav">
+          <a href="index.html">Home</a>
+          <a href="about.html">About</a>
+          <a href="tas.html">TAs</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <div class="hero-inner">
+            <div>
+              <h1>Welcome to MathByMsGarg</h1>
+              <p class="lead">info about class.</p>
+              <p style="margin-top:1rem"><a class="btn" href="tas.html">ta button</a> <a class="btn secondary" href="reviews/teacher.html" style="margin-left:.5rem">relink review</a></p>
+            </div>
+
+            <aside class="hero-card">
+              <div class="profile-card">
+                <div class="avatar">MG</div>
+                <div>
+                  <strong>reviews?</strong>
+                  <div style="color:var(--muted); font-size:.95rem">add smth</div>
+                  <div style="margin-top:.5rem"><span class="rating">★★★★★</span> <small style="color:var(--muted)">placeholder</small></div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="features container">
+        <article>
+          <h2>feature 1</h2>
+          <p>description here</p>
+        </article>
+        <article>
+          <h2>feature 2</h2>
+          <p>description here</p>
+        </article>
+        <article>
+          <h2>feature 3</h2>
+          <p>description here</p>
+        </article>
+      </section>
+
+      <section class="container pricing">
+        <h2 style="margin-top:1rem">pricing section</h2>
+        <div class="features" style="margin-top:.75rem">
+          <article>
+            <h3>option 1</h3>
+            <p><strong>$xx</strong> info</p>
+          </article>
+          <article>
+            <h3>option 2</h3>
+            <p><strong>$xx</strong> info</p>
+          </article>
+          <article>
+            <h3>option 3</h3>
+            <p><strong>$xx</strong> info</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="home-testimonials" class="container" style="margin-top:1.25rem">
+        <h2>what students say</h2>
+        <p>select a ta:</p>
+        <div style="margin-bottom:1rem">
+          <select id="ta-selector" style="padding:.5rem;border-radius:8px;border:1px solid #e6eef6;font-size:.95rem">
+            <option value="teacher">Ms. Garg (Teacher)</option>
+            <option value="ta1">TA #1</option>
+            <option value="ta2">TA #2</option>
+            <option value="ta3">TA #3</option>
+            <option value="ta4">TA #4</option>
+            <option value="ta5">TA #5</option>
+          </select>
+        </div>
+        <div id="home-testimonials-list" style="margin-top:.75rem"></div>
+        <p style="margin-top:.5rem"><a class="btn" href="#" id="ta-review-link">view reviews</a></p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <small>&copy; <span id="year"></span> MySite</small>
+      </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+  </body>
+</html>
