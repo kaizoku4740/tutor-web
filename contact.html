@@ -3,18 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Contact - MathByMsGarg</title>
+    <title>Contact - Math Academy by Mrs Garg</title>
     <link rel="stylesheet" href="css/styles.css">
   </head>
   <body>
     <header class="site-header">
       <div class="container">
-        <a class="brand" href="index.html">MathByMsGarg</a>
+        <a class="brand" href="index.html">Math Academy by Mrs Garg</a>
         <button id="nav-toggle" class="nav-toggle">☰</button>
         <nav id="main-nav" class="main-nav">
           <a href="index.html">Home</a>
           <a href="about.html">About</a>
           <a href="tas.html">TAs</a>
+          <a href="all-reviews.html">Reviews</a>
           <a href="contact.html">Contact</a>
         </nav>
       </div>
@@ -22,8 +23,18 @@
 
     <main class="container">
       <h1>Contact</h1>
-      <p>Send us a message — form is local-only (demo). - use javascript to link</p>
-      <form id="contact-form" class="contact-form">
+      <p>Send us a message.</p>
+      <form
+        id="contact-form"
+        class="contact-form"
+        action="https://formsubmit.co/kaizoku4740@gmail.com"
+        method="POST"
+        data-form-provider="formsubmit"
+      >
+        <input type="hidden" name="_subject" value="New Math Academy contact form message" />
+        <input type="hidden" name="_template" value="table" />
+        <input type="hidden" id="contact-webhook" name="_webhook" value="" />
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
         <label>
           Name
           <input type="text" name="name" required />
@@ -39,7 +50,7 @@
         <div class="actions">
           <button type="submit" class="btn">Send</button>
         </div>
-        <p id="form-status" class="form-status" aria-live="polite"></p>
+        <p id="form-status" class="form-status" aria-live="polite">Submit and we'll get back to you as soon as possible.</p>
       </form>
     </main>
 
@@ -49,6 +60,6 @@
       </div>
     </footer>
 
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=20260316-1"></script>
   </body>
 </html>

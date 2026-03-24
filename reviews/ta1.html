@@ -11,12 +11,13 @@
   <body>
     <header class="site-header">
       <div class="container">
-        <a class="brand" href="../index.html">MathByMsGarg</a>
+        <a class="brand" href="../index.html">Math Academy by Mrs Garg</a>
         <button id="nav-toggle" class="nav-toggle">☰</button>
         <nav id="main-nav" class="main-nav">
           <a href="../index.html">Home</a>
           <a href="../about.html">About</a>
           <a href="../tas.html">TAs</a>
+          <a href="../all-reviews.html">Reviews</a>
           <a href="../contact.html">Contact</a>
         </nav>
       </div>
@@ -57,14 +58,14 @@
 
     <footer class="site-footer">
       <div class="container">
-        <small>&copy; <span id="year"></span> MathByMsGarg</small>
+        <small>&copy; <span id="year"></span> Math Academy by Mrs Garg</small>
       </div>
     </footer>
 
     <script src="../js/main.js"></script>
     <script>
       const taId = 'ta1';
-      const storageKey = `reviews-${taId}`;
+      const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:9999' : '';
       const listEl = document.getElementById('reviews-list');
       const form = document.getElementById('review-form');
       const avgEl = document.getElementById('average-summary');
@@ -85,50 +86,51 @@
         return { avg: sum / reviews.length, count: reviews.length }
       }
 
-      function render(){
-        let reviews = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        const sort = document.getElementById('sort-select')?.value || 'newest';
-        if(sort === 'highest') reviews = reviews.slice().sort((a,b)=>b.rating - a.rating);
-        else reviews = reviews.slice().sort((a,b)=>b.ts - a.ts);
+      async function render(){
+        try {
+          const response = await fetch(`${API_BASE}/api/reviews/${taId}`);
+          if (!response.ok) throw new Error(`API error: ${response.status}`);
+          let reviews = await response.json();
+          
+          const sort = document.getElementById('sort-select')?.value || 'newest';
+          if(sort === 'highest') reviews = reviews.slice().sort((a,b)=>b.rating - a.rating);
+          else reviews = reviews.slice().sort((a,b)=>b.ts - a.ts);
 
-        const summary = computeSummary(reviews);
-        if(summary.count===0){ avgEl.textContent = 'No reviews yet — be the first!'; }
-        else { avgEl.innerHTML = `<strong>${summary.avg.toFixed(1)}</strong> average — ${summary.count} review${summary.count>1?'s':''}` }
+          const summary = computeSummary(reviews);
+          if(summary.count===0){ avgEl.textContent = 'No reviews yet — be the first!'; }
+          else { avgEl.innerHTML = `<strong>${summary.avg.toFixed(1)}</strong> average — ${summary.count} review${summary.count>1?'s':''}` }
 
-        if(reviews.length === 0){ listEl.innerHTML = '<p>No reviews yet — be the first!</p>'; return }
-        listEl.innerHTML = reviews.map((r,i)=>{
-          const name = appHelpers.escapeHtml(r.name);
-          const text = appHelpers.escapeHtml(r.text);
-          const date = appHelpers.formatDate(r.ts);
-          return `<div class="card reveal" style="animation-delay:${i*40}ms"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem"><div style="flex:1"><strong>${name}</strong><br><small style="color:var(--muted)">${date}</small></div><button class="delete-btn" data-id="${r.ts}" style="background:#dc2626;color:white;border:0;padding:.3rem .5rem;border-radius:6px;font-size:.75rem;cursor:pointer;white-space:nowrap">Delete</button></div><div style="margin:.5rem 0">${'★'.repeat(r.rating)}</div><p style="margin:0">${text}</p></div>`
-        }).join('');
-
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-          btn.addEventListener('click', function(e){
-            e.preventDefault();
-            const id = this.getAttribute('data-id');
-            const pwd = prompt('Enter password to delete:');
-            if(pwd === 'delete123'){
-              let reviews = JSON.parse(localStorage.getItem(storageKey) || '[]');
-              reviews = reviews.filter(r => r.ts !== Number(id));
-              localStorage.setItem(storageKey, JSON.stringify(reviews));
-              render();
-            } else if(pwd !== null){
-              alert('Wrong password.');
-            }
-          });
-        });
+          if(reviews.length === 0){ listEl.innerHTML = '<p>No reviews yet — be the first!</p>'; return }
+          listEl.innerHTML = reviews.map((r,i)=>{
+            const name = appHelpers.escapeHtml(r.name);
+            const text = appHelpers.escapeHtml(r.text);
+            const date = appHelpers.formatDate(r.ts);
+            return `<div class="card reveal" style="animation-delay:${i*40}ms"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem"><div style="flex:1"><strong>${name}</strong><br><small style="color:var(--muted)">${date}</small></div></div><div style="margin:.5rem 0">${'★'.repeat(r.rating)}</div><p style="margin:0">${text}</p></div>`
+          }).join('');
+        } catch (err) {
+          console.error('Failed to load reviews:', err);
+          avgEl.textContent = 'Error loading reviews.';
+          listEl.innerHTML = '<p style="color:#dc2626">Failed to load reviews</p>';
+        }
       }
 
-      form.addEventListener('submit', function(e){
+      form.addEventListener('submit', async function(e){
         e.preventDefault();
-        const data = new FormData(form);
-        const review = { name: data.get('name'), rating: Number(data.get('rating')||5), text: data.get('text'), ts: Date.now() };
-        let reviews = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        reviews.unshift(review);
-        localStorage.setItem(storageKey, JSON.stringify(reviews));
-        form.reset();
-        render();
+        try {
+          const data = new FormData(form);
+          const review = { name: data.get('name'), rating: Number(data.get('rating')||5), text: data.get('text') };
+          const response = await fetch(`${API_BASE}/api/reviews/${taId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(review)
+          });
+          if (!response.ok) throw new Error(`API error: ${response.status}`);
+          form.reset();
+          render();
+        } catch (err) {
+          console.error('Failed to submit review:', err);
+          alert('Failed to submit review. Please try again.');
+        }
       });
 
       document.getElementById('sort-select')?.addEventListener('change', render);

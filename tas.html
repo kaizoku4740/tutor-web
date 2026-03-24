@@ -3,34 +3,35 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>TAs — MathByMsGarg</title>
-    <meta name="description" content="Meet the tutoring team at MathByMsGarg.">
+    <title>TAs — Math Academy by Mrs Garg</title>
+    <meta name="description" content="Meet the tutoring team at Math Academy by Mrs Garg.">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   </head>
   <body>
     <header class="site-header">
       <div class="container">
-        <a class="brand" href="index.html">MathByMsGarg</a>
+        <a class="brand" href="index.html">Math Academy by Mrs Garg</a>
         <button id="nav-toggle" class="nav-toggle">☰</button>
         <nav id="main-nav" class="main-nav">
           <a href="index.html">Home</a>
           <a href="about.html">About</a>
           <a href="tas.html">TAs</a>
+          <a href="all-reviews.html">Reviews</a>
           <a href="contact.html">Contact</a>
         </nav>
       </div>
     </header>
 
     <main class="container">
-      <h1>Meet the Team</h1>
-      <p>Our experienced tutors ready to help you succeed in math.</p>
+      <h1>Our Team</h1>
+      <p>Meet the expert tutors at Math Academy by Mrs Garg</p>
       <div id="tas-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.25rem; margin-top:1.5rem"></div>
     </main>
 
     <footer class="site-footer">
       <div class="container">
-        <small>&copy; <span id="year"></span> MathByMsGarg</small>
+        <small>&copy; <span id="year"></span> Math Academy by Mrs Garg</small>
       </div>
     </footer>
 
@@ -38,7 +39,7 @@
     <script>
       (async function(){
         try {
-          const resp = await fetch('/tas.json');
+          const resp = await fetch('/tas.json?v=' + Date.now());
           const tas = await resp.json();
           const grid = document.getElementById('tas-grid');
           grid.innerHTML = tas.map(ta => `

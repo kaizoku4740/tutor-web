@@ -11,12 +11,13 @@
   <body>
     <header class="site-header">
       <div class="container">
-        <a class="brand" href="../index.html">MathByMsGarg</a>
+        <a class="brand" href="../index.html">Math Academy by Mrs Garg</a>
         <button id="nav-toggle" class="nav-toggle">☰</button>
         <nav id="main-nav" class="main-nav">
           <a href="../index.html">Home</a>
           <a href="../about.html">About</a>
           <a href="../tas.html">TAs</a>
+          <a href="../all-reviews.html">Reviews</a>
           <a href="../contact.html">Contact</a>
         </nav>
       </div>
@@ -57,16 +58,16 @@
 
     <footer class="site-footer">
       <div class="container">
-        <small>&copy; <span id="year"></span> MathByMsGarg</small>
+        <small>&copy; <span id="year"></span> Math Academy by Mrs Garg</small>
       </div>
     </footer>
 
     <script src="../js/main.js"></script>
     <script>
       // ===== REVIEW PAGE SETUP =====
-      // Set the TA ID and storage key for this specific review page
+      // Set the TA ID and API endpoint for this specific review page
       const taId = 'teacher';
-      const storageKey = `reviews-${taId}`;
+      const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:9999' : '';
 
       // ===== DOM ELEMENTS =====
       // Get references to the review list container, form, and summary display
@@ -85,71 +86,68 @@
 
       // ===== RENDER REVIEWS =====
       // Main function to fetch, sort, and display all reviews for this TA
-      function render(){
-        // Fetch reviews from localStorage, default to empty array if none exist
-        let reviews = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        
-        // Get sort preference (newest by default, or highest rating)
-        const sort = document.getElementById('sort-select')?.value || 'newest';
-        if(sort === 'highest') reviews = reviews.slice().sort((a,b)=>b.rating - a.rating);
-        else reviews = reviews.slice().sort((a,b)=>b.ts - a.ts);
+      async function render(){
+        try {
+          // Fetch reviews from Worker API
+          const response = await fetch(`${API_BASE}/api/reviews/${taId}`);
+          if (!response.ok) throw new Error(`API error: ${response.status}`);
+          let reviews = await response.json();
+          
+          // Get sort preference (newest by default, or highest rating)
+          const sort = document.getElementById('sort-select')?.value || 'newest';
+          if(sort === 'highest') reviews = reviews.slice().sort((a,b)=>b.rating - a.rating);
+          else reviews = reviews.slice().sort((a,b)=>b.ts - a.ts);
 
-        // Calculate and display average rating summary
-        const summary = computeSummary(reviews);
-        if(summary.count===0){ avgEl.textContent = 'No reviews yet — be the first!'; }
-        else { avgEl.innerHTML = `<strong>${summary.avg.toFixed(1)}</strong> average — ${summary.count} review${summary.count>1?'s':''}` }
+          // Calculate and display average rating summary
+          const summary = computeSummary(reviews);
+          if(summary.count===0){ avgEl.textContent = 'No reviews yet — be the first!'; }
+          else { avgEl.innerHTML = `<strong>${summary.avg.toFixed(1)}</strong> average — ${summary.count} review${summary.count>1?'s':''}` }
 
-        // If no reviews, show placeholder message
-        if(reviews.length === 0){ listEl.innerHTML = '<p>No reviews yet — be the first!</p>'; return }
-        
-        // Render each review as a card with name, date, rating, text, and delete button
-        listEl.innerHTML = reviews.map((r,i)=>{
-          const name = appHelpers.escapeHtml(r.name);
-          const text = appHelpers.escapeHtml(r.text);
-          const date = appHelpers.formatDate(r.ts);
-          return `<div class="card reveal" style="animation-delay:${i*40}ms"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem"><div style="flex:1"><strong>${name}</strong><br><small style="color:var(--muted)">${date}</small></div><button class="delete-btn" data-id="${r.ts}" style="background:#dc2626;color:white;border:0;padding:.3rem .5rem;border-radius:6px;font-size:.75rem;cursor:pointer;white-space:nowrap">Delete</button></div><div style="margin:.5rem 0">${'★'.repeat(r.rating)}</div><p style="margin:0">${text}</p></div>`
-        }).join('');
-
-        // ===== ATTACH DELETE BUTTON HANDLERS =====
-        // For each delete button, add click listener to prompt for password and remove review
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-          btn.addEventListener('click', function(e){
-            e.preventDefault();
-            const id = this.getAttribute('data-id');
-            // Prompt user for password before deleting
-            const pwd = prompt('Enter password to delete:');
-            if(pwd === 'delete123'){
-              // Password is correct: fetch reviews, filter out the one with matching timestamp, save back
-              let reviews = JSON.parse(localStorage.getItem(storageKey) || '[]');
-              reviews = reviews.filter(r => r.ts !== Number(id));
-              localStorage.setItem(storageKey, JSON.stringify(reviews));
-              // Re-render to show the updated list
-              render();
-            } else if(pwd !== null){
-              // Wrong password (but not cancelled)
-              alert('Wrong password.');
-            }
-          });
-        });
+          // If no reviews, show placeholder message
+          if(reviews.length === 0){ listEl.innerHTML = '<p>No reviews yet — be the first!</p>'; return }
+          
+          // Render each review as a card with name, date, rating, and text (NO DELETE BUTTON)
+          listEl.innerHTML = reviews.map((r,i)=>{
+            const name = appHelpers.escapeHtml(r.name);
+            const text = appHelpers.escapeHtml(r.text);
+            const date = appHelpers.formatDate(r.ts);
+            return `<div class="card reveal" style="animation-delay:${i*40}ms"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem"><div style="flex:1"><strong>${name}</strong><br><small style="color:var(--muted)">${date}</small></div></div><div style="margin:.5rem 0">${'★'.repeat(r.rating)}</div><p style="margin:0">${text}</p></div>`
+          }).join('');
+        } catch (err) {
+          console.error('Failed to load reviews:', err);
+          avgEl.textContent = 'Error loading reviews. Please try again.';
+          listEl.innerHTML = '<p style="color:#dc2626">Failed to load reviews</p>';
+        }
       }
 
       // ===== FORM SUBMISSION HANDLER =====
-      // Handle adding new reviews: prevent default, create review object, save to localStorage, re-render
-      form.addEventListener('submit', function(e){
+      // Handle adding new reviews: validate form, POST to Worker API, re-render
+      form.addEventListener('submit', async function(e){
         e.preventDefault();
-        // Extract form data
-        const data = new FormData(form);
-        // Create review object with name, rating, text, and current timestamp
-        const review = { name: data.get('name'), rating: Number(data.get('rating')||5), text: data.get('text'), ts: Date.now() };
-        // Fetch existing reviews and add new one to the front
-        let reviews = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        reviews.unshift(review);
-        // Save updated reviews array back to localStorage
-        localStorage.setItem(storageKey, JSON.stringify(reviews));
-        // Clear the form for next submission
-        form.reset();
-        // Re-render to show the new review
-        render();
+        
+        try {
+          // Extract form data
+          const data = new FormData(form);
+          // Create review object with name, rating, text
+          const review = { name: data.get('name'), rating: Number(data.get('rating')||5), text: data.get('text') };
+          
+          // POST to Worker API
+          const response = await fetch(`${API_BASE}/api/reviews/${taId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(review)
+          });
+          
+          if (!response.ok) throw new Error(`API error: ${response.status}`);
+          
+          // Clear the form for next submission
+          form.reset();
+          // Re-render to show the new review
+          render();
+        } catch (err) {
+          console.error('Failed to submit review:', err);
+          alert('Failed to submit review. Please try again.');
+        }
       });
 
       // ===== SORT DROPDOWN LISTENER =====

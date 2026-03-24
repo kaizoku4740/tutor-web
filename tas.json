@@ -3,9 +3,9 @@
     "id": "teacher",
     "name": "Ms. Garg",
     "title": "Teacher",
-    "bio": "5+ years of tutoring experience. BSc Mathematics. Personalized lesson plans and test prep.",
-    "subjects": ["Algebra", "Calculus", "Competition Math"],
-    "experience": "5+ years",
+    "bio": "Coming soon.",
+    "subjects": ["TBD"],
+    "experience": "TBD",
     "isTeacher": true
   },
   {
