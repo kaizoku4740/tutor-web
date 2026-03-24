@@ -142,7 +142,7 @@ function HomePage({ tas }) {
           Modern tutoring experience.
         </h1>
         <p className="hero-copy">
-          Your website now runs on React and is ready for cleaner updates across all pages.
+          Personalized math support with trusted tutors
         </p>
         <div className="hero-highlights">
           <article className="hero-highlight-card">
