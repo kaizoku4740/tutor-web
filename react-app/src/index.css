@@ -1,0 +1,50 @@
+:root {
+  --bg-main: #eef1ff;
+  --bg-mist: #e4e8ff;
+  --text-main: #1c1f4a;
+  --text-muted: #5e6392;
+  --border: #d6d9f5;
+  --border-soft: #e4e6fb;
+  --accent-1: #5a57e6;
+  --accent-2: #7f46d8;
+  --accent-2-dark: #5a2fae;
+  --font-body: 'Public Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-title: 'Sora', 'Avenir Next', 'Segoe UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--text-main);
+  font: 17px/1.5 var(--font-body);
+  background:
+    radial-gradient(circle at 9% 0%, rgba(126, 92, 244, 0.2), transparent 36%),
+    radial-gradient(circle at 88% 16%, rgba(104, 164, 255, 0.32), transparent 44%),
+    linear-gradient(180deg, var(--bg-mist), var(--bg-main));
+}
+
+#root {
+  width: min(1120px, calc(100% - 1.8rem));
+  margin: 0 auto;
+  padding: 1rem 0 2rem;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}

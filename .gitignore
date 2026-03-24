@@ -1,0 +1,8 @@
+.DS_Store
+*.log
+.env
+.wrangler/
+node_modules/
+dist/
+react-app/dist/
+react-app/node_modules/
