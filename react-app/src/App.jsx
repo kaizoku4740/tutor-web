@@ -142,7 +142,7 @@ function HomePage({ tas }) {
           Modern tutoring experience.
         </h1>
         <p className="hero-copy">
-          Personalized math support with trusted tutors
+          personalized math support with trusted tutors
         </p>
         <div className="hero-highlights">
           <article className="hero-highlight-card">
