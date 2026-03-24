@@ -77,7 +77,10 @@ pkill -f "http.server 8888"
 - **Day 7**: 2 hours - March 18th, 6:00 PM to 8:00 PM
   - redid visuals
 
-**Total**: 26.5 hours
+- **Day 8**: 1.5 hours - March 24th, 5:00 PM to 6:30 PM
+  - redid visuals and animations
+
+**Total**: 28 hours
 
 ## Notes
 
@@ -115,6 +118,22 @@ Notes:
 2. Deploy.
 3. Submit once and confirm the email.
 4. Submit again and verify delivery.
+
+## Deploy To Cloudflare Pages (React App)
+
+Use these settings when connecting this GitHub repository:
+
+1. Framework preset: `Vite`
+2. Build command: `cd react-app && npm ci && npm run build`
+3. Build output directory: `react-app/dist`
+4. Root directory: `/`
+5. Functions directory: `functions`
+
+Post-deploy verification:
+
+1. Open `/about`, `/tas`, `/reviews`, and one `/reviews/:taId` path directly to confirm SPA routing works.
+2. Submit one contact form test.
+3. Open admin using triple-click on the footer and confirm review deletion works.
 
 ## Future Enhancements
 
@@ -189,9 +208,7 @@ Notes:
 - **Wrangler CLI** - Cloudflare deployment and management tool
 
 ### Architecture
-- **Frontend**: Static HTML/CSS/JavaScript (no framework - vanilla JS for simplicity)
+- **Frontend**: React + Vite (`react-app/`)
 - **Backend**: Python (local) / JavaScript (production via Cloudflare Workers)
 - **Database**: In-memory (local) / KV storage (production)
 - **API**: RESTful endpoints with CORS support
-
-re_e1HSLaPJ_BsvUUexRAD1VcwoGLBsiHCYc
