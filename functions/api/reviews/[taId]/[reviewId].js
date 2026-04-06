@@ -3,6 +3,17 @@
 
 const ADMIN_PASSWORD = 'password';
 
+const TA_ASSIGNMENTS = {
+  "TA 1": "Neha M.",
+  "TA 2": "Nandita S.",
+  "TA 3": "Samhithaa S.",
+  "TA 4": "Abhiram M."
+};
+
+function getTAName(taId) {
+  return TA_ASSIGNMENTS[taId] || taId;
+}
+
 export async function onRequestDelete({ params, env, request }) {
   const adminKey = request.headers.get('X-Admin-Key');
   if (adminKey !== ADMIN_PASSWORD) {

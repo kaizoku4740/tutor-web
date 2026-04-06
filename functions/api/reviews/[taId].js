@@ -4,6 +4,17 @@
 
 const ADMIN_PASSWORD = 'password';
 
+const TA_ASSIGNMENTS = {
+  "TA 1": "Neha M.",
+  "TA 2": "Nandita S.",
+  "TA 3": "Samhithaa S.",
+  "TA 4": "Abhiram M."
+};
+
+function getTAName(taId) {
+  return TA_ASSIGNMENTS[taId] || taId;
+}
+
 export async function onRequestGet({ params, env }) {
   try {
     const key = `reviews-${params.taId}`;

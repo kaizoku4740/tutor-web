@@ -10,6 +10,7 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom'
+import SignupPage from './SignupPage'
 import './App.css'
 
 const CONTACT_ENDPOINT = 'https://formsubmit.co/kaizoku4740@gmail.com'

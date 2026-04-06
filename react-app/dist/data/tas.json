@@ -10,7 +10,7 @@
   },
   {
     "id": "ta1",
-    "name": "TA #1",
+    "name": "Neha",
     "title": "TBD",
     "bio": "Coming soon.",
     "subjects": ["TBD"],
@@ -18,7 +18,7 @@
   },
   {
     "id": "ta2",
-    "name": "TA #2",
+    "name": "Nandita",
     "title": "TBD",
     "bio": "Coming soon.",
     "subjects": ["TBD"],
@@ -26,7 +26,7 @@
   },
   {
     "id": "ta3",
-    "name": "TA #3",
+    "name": "Samhithaa",
     "title": "TBD",
     "bio": "Coming soon.",
     "subjects": ["TBD"],
@@ -34,15 +34,7 @@
   },
   {
     "id": "ta4",
-    "name": "TA #4",
-    "title": "TBD",
-    "bio": "Coming soon.",
-    "subjects": ["TBD"],
-    "experience": "TBD"
-  },
-  {
-    "id": "ta5",
-    "name": "TA #5",
+    "name": "Abhiram",
     "title": "TBD",
     "bio": "Coming soon.",
     "subjects": ["TBD"],
