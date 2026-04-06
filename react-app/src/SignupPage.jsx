@@ -58,18 +58,27 @@ const SLOTS = generateSlots(3, 2026); // April 2026 (month is 0-indexed)
 
 export default function SignupPage() {
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedSlot, setSelectedSlot] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     emailOrPhone: '',
     goal: '',
   });
   const [showSignupForm, setShowSignupForm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
 
   const handleDayClick = (date) => {
     const dateString = date.toISOString().split('T')[0];
-    if (SLOTS.some((slot) => slot.date === dateString)) {
+    const slotsForDate = SLOTS.filter((slot) => slot.date === dateString);
+    if (slotsForDate.length > 0) {
       setSelectedDate(date);
+      setSelectedSlot(slotsForDate[0]); // Select the first available slot
       setShowSignupForm(true);
+      setValidationErrors({});
+      setError('');
     }
   };
 
@@ -103,13 +112,102 @@ export default function SignupPage() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    // Clear validation error for this field when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors({ ...validationErrors, [name]: '' });
+    }
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.name.trim()) errors.name = 'Name is required';
+    if (!formData.emailOrPhone.trim()) errors.emailOrPhone = 'Email or phone is required';
+    if (!formData.goal.trim()) errors.goal = 'Goal is required';
+    
+    // Validate email or phone format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[\d\s\-\(\)\+]{10,}$/;
+    const isValidEmail = emailRegex.test(formData.emailOrPhone.trim());
+    const isValidPhone = phoneRegex.test(formData.emailOrPhone.trim());
+    
+    if (formData.emailOrPhone.trim() && !isValidEmail && !isValidPhone) {
+      errors.emailOrPhone = 'Please enter a valid email or phone number';
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', { ...formData, date: selectedDate });
-    setFormData({ name: '', emailOrPhone: '', goal: '' });
+    
+    // Validate form
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
+    // Check if slot is full
+    if (selectedSlot && selectedSlot.filled >= selectedSlot.capacity) {
+      setError('This slot is now full. Please select another time.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      // Send data to backend
+      const response = await fetch('/api/contact-messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          form_data: {
+            name: formData.name,
+            email: formData.emailOrPhone,
+            message: `Signup Request:\nTutor: ${selectedSlot.tutor}\nDate: ${selectedDate.toDateString()}\nTime: ${selectedSlot.time}\nGoal: ${formData.goal}`,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit signup');
+      }
+
+      // Show success message
+      setSuccess(true);
+      setFormData({ name: '', emailOrPhone: '', goal: '' });
+      
+      // Close form after 3 seconds
+      setTimeout(() => {
+        setSuccess(false);
+        setShowSignupForm(false);
+        setSelectedDate(null);
+        setSelectedSlot(null);
+      }, 3000);
+    } catch (err) {
+      setError('Failed to submit signup. Please try again.');
+      console.error('Signup error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
     setShowSignupForm(false);
+    setSelectedDate(null);
+    setSelectedSlot(null);
+    setFormData({ name: '', emailOrPhone: '', goal: '' });
+    setValidationErrors({});
+    setError('');
+  };
+
+  const handleClearForm = () => {
+    setFormData({ name: '', emailOrPhone: '', goal: '' });
+    setValidationErrors({});
+    setError('');
   };
 
   return (
@@ -135,41 +233,77 @@ export default function SignupPage() {
           unmountOnExit
         >
           <div className="signup-form">
-            <h2>Sign Up for {selectedDate.toDateString()}</h2>
-            <form onSubmit={handleSubmit}>
-              <label>
-                Name:
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
-              <br />
-              <label>
-                Email/Phone:
-                <input
-                  type="text"
-                  name="emailOrPhone"
-                  value={formData.emailOrPhone}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
-              <br />
-              <label>
-                Goal for the day:
-                <textarea
-                  name="goal"
-                  value={formData.goal}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <br />
-              <button type="submit">Submit</button>
-            </form>
+            {success ? (
+              <div className="success-message">
+                <h2>✓ Signup Confirmed!</h2>
+                <p>Thank you for signing up! A confirmation email has been sent to {formData.emailOrPhone}.</p>
+                <p>We look forward to seeing you on {selectedDate.toDateString()} at {selectedSlot?.time} with {selectedSlot?.tutor}.</p>
+              </div>
+            ) : (
+              <>
+                <div className="form-header">
+                  <h2>Sign Up for {selectedDate.toDateString()}</h2>
+                  {selectedSlot && (
+                    <p className="slot-info">{selectedSlot.time} - {selectedSlot.tutor} ({selectedSlot.filled}/{selectedSlot.capacity} filled)</p>
+                  )}
+                </div>
+
+                {error && <div className="error-message">{error}</div>}
+
+                <form onSubmit={handleSubmit}>
+                  <label>
+                    Name: *
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className={validationErrors.name ? 'input-error' : ''}
+                      placeholder="Enter your name"
+                    />
+                    {validationErrors.name && <span className="field-error">{validationErrors.name}</span>}
+                  </label>
+
+                  <label>
+                    Email/Phone: *
+                    <input
+                      type="text"
+                      name="emailOrPhone"
+                      value={formData.emailOrPhone}
+                      onChange={handleInputChange}
+                      className={validationErrors.emailOrPhone ? 'input-error' : ''}
+                      placeholder="Enter your email or phone number"
+                    />
+                    {validationErrors.emailOrPhone && <span className="field-error">{validationErrors.emailOrPhone}</span>}
+                  </label>
+
+                  <label>
+                    Goal for the session: *
+                    <textarea
+                      name="goal"
+                      value={formData.goal}
+                      onChange={handleInputChange}
+                      className={validationErrors.goal ? 'input-error' : ''}
+                      placeholder="What would you like to work on?"
+                      rows="4"
+                    />
+                    {validationErrors.goal && <span className="field-error">{validationErrors.goal}</span>}
+                  </label>
+
+                  <div className="form-actions">
+                    <button type="submit" disabled={loading} className="btn-submit">
+                      {loading ? 'Submitting...' : 'Confirm Signup'}
+                    </button>
+                    <button type="button" onClick={handleClearForm} className="btn-clear" disabled={loading}>
+                      Clear Form
+                    </button>
+                    <button type="button" onClick={handleCancel} className="btn-cancel" disabled={loading}>
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
           </div>
         </CSSTransition>
       )}

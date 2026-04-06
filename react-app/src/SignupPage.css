@@ -112,6 +112,101 @@
   background-color: #45a049;
 }
 
+.signup-form button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Form actions container */
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-submit {
+  background-color: #4CAF50 !important;
+  flex: 1;
+  min-width: 150px;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background-color: #45a049 !important;
+}
+
+.btn-clear {
+  background-color: #2196F3 !important;
+  flex: 0 1 auto;
+}
+
+.btn-clear:hover:not(:disabled) {
+  background-color: #0b7dda !important;
+}
+
+.btn-cancel {
+  background-color: #f44336 !important;
+  flex: 0 1 auto;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background-color: #da190b !important;
+}
+
+/* Error styling */
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border-left: 4px solid #c62828;
+}
+
+.field-error {
+  color: #d32f2f;
+  font-size: 0.85rem;
+  display: block;
+  margin-top: 4px;
+}
+
+.input-error {
+  border-color: #d32f2f !important;
+  background-color: #ffebee !important;
+}
+
+/* Success message */
+.success-message {
+  text-align: center;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  border-radius: 8px;
+}
+
+.success-message h2 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: white;
+}
+
+.success-message p {
+  font-size: 1rem;
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+/* Slot info */
+.slot-info {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 8px;
+}
+
+.form-header {
+  margin-bottom: 20px;
+}
+
 /* Added fade-in and fade-out animations for transitions */
 .fade-enter {
   opacity: 0;
