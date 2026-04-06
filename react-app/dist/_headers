@@ -1,0 +1,8 @@
+/*
+  Cache-Control: max-age=0, no-cache, no-store, must-revalidate
+
+/assets/*
+  Cache-Control: max-age=31536000, immutable
+
+/favicon.svg
+  Cache-Control: max-age=604800
