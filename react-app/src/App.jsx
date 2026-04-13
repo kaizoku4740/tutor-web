@@ -596,9 +596,19 @@ function AdminPage({ tas }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [passwordInput, setPasswordInput] = useState('')
   const [loginStatus, setLoginStatus] = useState('')
+  const [activeTab, setActiveTab] = useState('reviews') // 'reviews', 'messages', 'signups'
   const [filterTa, setFilterTa] = useState('')
   const [allReviews, setAllReviews] = useState({})
   const [messages, setMessages] = useState([])
+  const [signups, setSignups] = useState([])
+  const [selectedTutorFilter, setSelectedTutorFilter] = useState('')
+
+  const TUTORS = [
+    'Neha M.',
+    'Nandita S.',
+    'Samhithaa S.',
+    'Abhiram M.'
+  ]
 
   async function loadAllReviews() {
     try {
@@ -626,9 +636,25 @@ function AdminPage({ tas }) {
         return
       }
       const data = await res.json()
-      setMessages(Array.isArray(data) ? data : [])
+      setMessages(Array.isArray(data) ? data : data.signups || [])
     } catch {
       setMessages([])
+    }
+  }
+
+  async function loadSignups() {
+    try {
+      const res = await fetch('/api/contact-messages', {
+        headers: { 'X-Admin-Key': ADMIN_PASSWORD },
+      })
+      if (!res.ok) {
+        setSignups([])
+        return
+      }
+      const data = await res.json()
+      setSignups(Array.isArray(data.signups) ? data.signups : [])
+    } catch {
+      setSignups([])
     }
   }
 
@@ -639,6 +665,7 @@ function AdminPage({ tas }) {
       setPasswordInput('')
       loadAllReviews()
       loadMessages()
+      loadSignups()
       return
     }
     setLoginStatus('Wrong password. Try again.')
@@ -660,6 +687,22 @@ function AdminPage({ tas }) {
     }
   }
 
+  async function deleteSignup(signupId) {
+    if (!window.confirm('Are you sure you want to delete this signup?')) {
+      return
+    }
+    try {
+      const res = await fetch(`/api/signups?id=${signupId}`, {
+        method: 'DELETE',
+        headers: { 'X-Admin-Key': ADMIN_PASSWORD },
+      })
+      if (!res.ok) return
+      setSignups((prev) => prev.filter((s) => s.id !== signupId))
+    } catch {
+      alert('Failed to delete signup')
+    }
+  }
+
   async function clearMessages() {
     try {
       const res = await fetch('/api/contact-messages', {
@@ -676,6 +719,10 @@ function AdminPage({ tas }) {
   const visibleEntries = filterTa
     ? [[filterTa, allReviews[filterTa] || []]]
     : tas.map((ta) => [ta.id, allReviews[ta.id] || []])
+
+  const filteredSignups = selectedTutorFilter
+    ? signups.filter((s) => s.tutor === selectedTutorFilter)
+    : signups
 
   return (
     <section className="panel admin-layout">
@@ -699,76 +746,167 @@ function AdminPage({ tas }) {
         </div>
       ) : (
         <>
-          <div className="panel-head">
-            <h2>All Reviews</h2>
-            <button className="btn btn-small" type="button" onClick={() => setIsLoggedIn(false)}>
+          <div className="admin-tabs">
+            <button
+              className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
+              onClick={() => setActiveTab('reviews')}
+            >
+              Reviews
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'messages' ? 'active' : ''}`}
+              onClick={() => setActiveTab('messages')}
+            >
+              Messages
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'signups' ? 'active' : ''}`}
+              onClick={() => setActiveTab('signups')}
+            >
+              Signups
+            </button>
+            <button className="btn btn-small logout-btn" type="button" onClick={() => setIsLoggedIn(false)}>
               Logout
             </button>
           </div>
 
-          <label>
-            Filter by tutor
-            <select value={filterTa} onChange={(e) => setFilterTa(e.target.value)}>
-              <option value="">All TAs</option>
-              {tas.map((ta) => (
-                <option key={ta.id} value={ta.id}>
-                  {ta.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          {activeTab === 'reviews' && (
+            <>
+              <label>
+                Filter by tutor
+                <select value={filterTa} onChange={(e) => setFilterTa(e.target.value)}>
+                  <option value="">All TAs</option>
+                  {tas.map((ta) => (
+                    <option key={ta.id} value={ta.id}>
+                      {ta.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-          <div className="review-list-stack">
-            {visibleEntries.map(([taId, reviews]) => (
-              <div key={taId}>
-                <h3>{tas.find((ta) => ta.id === taId)?.name || taId}</h3>
-                {(reviews || []).length === 0 && <p className="ta-title">No reviews yet.</p>}
-                {(reviews || []).map((r) => (
-                  <article className="review-card" key={`${taId}-${r.id}`}>
+              <div className="review-list-stack">
+                {visibleEntries.map(([taId, reviews]) => (
+                  <div key={taId}>
+                    <h3>{tas.find((ta) => ta.id === taId)?.name || taId}</h3>
+                    {(reviews || []).length === 0 && <p className="ta-title">No reviews yet.</p>}
+                    {(reviews || []).map((r) => (
+                      <article className="review-card" key={`${taId}-${r.id}`}>
+                        <div className="review-meta">
+                          <div>
+                            <strong>{r.name}</strong>
+                            <div className="ta-title">{formatDate(r.ts)}</div>
+                          </div>
+                          <button
+                            className="btn btn-small"
+                            type="button"
+                            onClick={() => deleteReview(taId, r.id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                        <p className="stars">{stars(r.rating)}</p>
+                        <p>{r.text}</p>
+                      </article>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {activeTab === 'messages' && (
+            <>
+              <div className="panel-head">
+                <h2>Contact Messages</h2>
+                <button className="btn btn-small" type="button" onClick={clearMessages}>
+                  Clear all
+                </button>
+              </div>
+              <div className="review-list-stack">
+                {messages.length === 0 && (
+                  <p className="ta-title">No contact messages yet.</p>
+                )}
+                {messages.map((msg) => (
+                  <article className="review-card" key={msg.id}>
                     <div className="review-meta">
                       <div>
-                        <strong>{r.name}</strong>
-                        <div className="ta-title">{formatDate(r.ts)}</div>
+                        <strong>{msg.name || 'Unknown'}</strong>
+                        <div className="ta-title">{formatDate(msg.ts)}</div>
                       </div>
-                      <button
-                        className="btn btn-small"
-                        type="button"
-                        onClick={() => deleteReview(taId, r.id)}
-                      >
-                        Delete
-                      </button>
+                      <span>{msg.email || 'No email'}</span>
                     </div>
-                    <p className="stars">{stars(r.rating)}</p>
-                    <p>{r.text}</p>
+                    <p>{msg.message || ''}</p>
                   </article>
                 ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
 
-          <div className="panel-head top-gap">
-            <h2>Contact Messages</h2>
-            <button className="btn btn-small" type="button" onClick={clearMessages}>
-              Clear all
-            </button>
-          </div>
-          <div className="review-list-stack">
-            {messages.length === 0 && (
-              <p className="ta-title">No contact messages yet or local API does not expose them.</p>
-            )}
-            {messages.map((msg) => (
-              <article className="review-card" key={msg.id}>
-                <div className="review-meta">
-                  <div>
-                    <strong>{msg.name || 'Unknown'}</strong>
-                    <div className="ta-title">{formatDate(msg.ts)}</div>
-                  </div>
-                  <span>{msg.email || 'No email'}</span>
+          {activeTab === 'signups' && (
+            <>
+              <div className="panel-head">
+                <h2>Signup Dashboard</h2>
+                <button className="btn btn-small" type="button" onClick={loadSignups}>
+                  Refresh
+                </button>
+              </div>
+
+              <label>
+                Filter by tutor
+                <select value={selectedTutorFilter} onChange={(e) => setSelectedTutorFilter(e.target.value)}>
+                  <option value="">All TAs</option>
+                  {TUTORS.map((tutor) => (
+                    <option key={tutor} value={tutor}>
+                      {tutor}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="signup-stats">
+                <div className="stat">
+                  <strong>{filteredSignups.length}</strong>
+                  <span>Total Signups</span>
                 </div>
-                <p>{msg.message || ''}</p>
-              </article>
-            ))}
-          </div>
+              </div>
+
+              <div className="review-list-stack">
+                {filteredSignups.length === 0 ? (
+                  <p className="ta-title">No signups yet.</p>
+                ) : (
+                  filteredSignups
+                    .sort((a, b) => new Date(a.date) - new Date(b.date))
+                    .map((signup) => (
+                      <article className="review-card signup-card" key={signup.id}>
+                        <div className="review-meta">
+                          <div>
+                            <strong>{signup.name}</strong>
+                            <div className="ta-title">
+                              {signup.tutor} · {new Date(signup.date).toLocaleDateString()} at {signup.time}
+                            </div>
+                          </div>
+                          <button
+                            className="btn btn-small btn-delete"
+                            type="button"
+                            onClick={() => deleteSignup(signup.id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                        <div className="signup-details">
+                          <p>
+                            <strong>Contact:</strong> {signup.isEmail ? '📧' : '📞'} {signup.contact}
+                          </p>
+                          <p>
+                            <strong>Goal:</strong> {signup.goal}
+                          </p>
+                        </div>
+                      </article>
+                    ))
+                )}
+              </div>
+            </>
+          )}
         </>
       )}
     </section>
