@@ -239,9 +239,13 @@ export default function SignupPage() {
           <div className="signup-form">
             {success ? (
               <div className="success-message">
-                <h2>✓ Signup Confirmed!</h2>
-                <p>Thank you for signing up! A confirmation email has been sent to {formData.emailOrPhone}.</p>
-                <p>We look forward to seeing you on {selectedDate.toDateString()} at {selectedSlot?.time} with {selectedSlot?.tutor}.</p>
+                <h2>✓ You're All Set!</h2>
+                <p><strong>Name:</strong> {formData.name}</p>
+                <p><strong>Contact:</strong> {formData.emailOrPhone}</p>
+                <p><strong>Topic:</strong> {formData.goal}</p>
+                <p style={{ marginTop: '15px', fontSize: '0.95em', color: '#f0f0f0' }}>
+                  See you on {selectedDate.toDateString()} at {selectedSlot?.time} with {selectedSlot?.tutor}!
+                </p>
               </div>
             ) : (
               <>
