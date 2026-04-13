@@ -1,0 +1,12 @@
+# Cloudflare Pages configuration
+
+The build output is pre-built and located in `react-app/dist/`.
+
+## Deployment
+
+This project uses:
+- **Framework**: React 18 with Vite
+- **Build Output**: `react-app/dist/`
+- **Functions**: `/functions/api/` (Cloudflare Pages Functions)
+
+Cloudflare Pages is configured in `wrangler.toml` to serve from `react-app/dist/`.
