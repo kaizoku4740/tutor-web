@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { CSSTransition } from 'react-transition-group';
@@ -109,7 +109,7 @@ export default function SignupPage() {
   };
 
   // Fetch counts on component mount and set up polling
-  React.useEffect(() => {
+  useEffect(() => {
     fetchSlotCounts();
     const interval = setInterval(fetchSlotCounts, 5000); // Refresh every 5 seconds
     return () => clearInterval(interval);

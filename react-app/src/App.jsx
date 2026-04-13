@@ -11,6 +11,7 @@ import {
   useParams,
 } from 'react-router-dom'
 import SignupPage from './SignupPage'
+import TADashboard from './TADashboard'
 import './App.css'
 
 const CONTACT_ENDPOINT = 'https://formsubmit.co/kaizoku4740@gmail.com'
@@ -781,6 +782,7 @@ function App() {
           <Route path="/reviews" element={<ReviewsPage tas={tas} />} />
           <Route path="/reviews/:taId" element={<TAReviewPage tas={tas} />} />
           <Route path="/admin" element={<AdminPage tas={tas} />} />
+          <Route path="/ta-dashboard" element={<TADashboard />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>
