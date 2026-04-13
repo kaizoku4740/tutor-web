@@ -37,19 +37,20 @@ export default function TADashboard() {
   useEffect(() => {
     loadDashboard();
     
-    // Only refresh if user is not actively using the dashboard
-    if (!mouseActive) {
-      intervalRef.current = setInterval(() => {
+    // Set up interval that checks mouseActive status
+    const interval = setInterval(() => {
+      // Only refresh if user is NOT actively using the dashboard
+      if (!mouseActive) {
         loadDashboard();
-      }, 10000); // Refresh every 10 seconds when idle
-    }
+      }
+    }, 10000); // Check every 10 seconds
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      if (interval) {
+        clearInterval(interval);
       }
     };
-  }, [selectedTutor, mouseActive]);
+  }, [selectedTutor]); // Only depend on selectedTutor, not mouseActive
 
   async function loadDashboard() {
     setError('');
