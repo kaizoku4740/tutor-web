@@ -596,19 +596,10 @@ function AdminPage({ tas }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [passwordInput, setPasswordInput] = useState('')
   const [loginStatus, setLoginStatus] = useState('')
-  const [activeTab, setActiveTab] = useState('reviews') // 'reviews', 'messages', 'signups'
+  const [activeTab, setActiveTab] = useState('reviews') // 'reviews', 'messages'
   const [filterTa, setFilterTa] = useState('')
   const [allReviews, setAllReviews] = useState({})
   const [messages, setMessages] = useState([])
-  const [signups, setSignups] = useState([])
-  const [selectedTutorFilter, setSelectedTutorFilter] = useState('')
-
-  const TUTORS = [
-    'Neha M.',
-    'Nandita S.',
-    'Samhithaa S.',
-    'Abhiram M.'
-  ]
 
   async function loadAllReviews() {
     try {
@@ -636,29 +627,9 @@ function AdminPage({ tas }) {
         return
       }
       const data = await res.json()
-      // The API returns { success: true, count: ..., signups: [...] }
-      // Messages are the old data structure, but we get signups now
       setMessages(Array.isArray(data) ? data : [])
     } catch {
       setMessages([])
-    }
-  }
-
-  async function loadSignups() {
-    try {
-      const res = await fetch('/api/contact-messages', {
-        headers: { 'X-Admin-Key': ADMIN_PASSWORD },
-      })
-      if (!res.ok) {
-        setSignups([])
-        return
-      }
-      const data = await res.json()
-      // The API returns { success: true, count: ..., signups: [...] }
-      setSignups(data.signups && Array.isArray(data.signups) ? data.signups : [])
-    } catch (err) {
-      console.error('Error loading signups:', err)
-      setSignups([])
     }
   }
 
@@ -669,7 +640,6 @@ function AdminPage({ tas }) {
       setPasswordInput('')
       loadAllReviews()
       loadMessages()
-      loadSignups()
       return
     }
     setLoginStatus('Wrong password. Try again.')
@@ -691,22 +661,6 @@ function AdminPage({ tas }) {
     }
   }
 
-  async function deleteSignup(signupId) {
-    if (!window.confirm('Are you sure you want to delete this signup?')) {
-      return
-    }
-    try {
-      const res = await fetch(`/api/signups?id=${signupId}`, {
-        method: 'DELETE',
-        headers: { 'X-Admin-Key': ADMIN_PASSWORD },
-      })
-      if (!res.ok) return
-      setSignups((prev) => prev.filter((s) => s.id !== signupId))
-    } catch {
-      alert('Failed to delete signup')
-    }
-  }
-
   async function clearMessages() {
     try {
       const res = await fetch('/api/contact-messages', {
@@ -723,10 +677,6 @@ function AdminPage({ tas }) {
   const visibleEntries = filterTa
     ? [[filterTa, allReviews[filterTa] || []]]
     : tas.map((ta) => [ta.id, allReviews[ta.id] || []])
-
-  const filteredSignups = selectedTutorFilter
-    ? signups.filter((s) => s.tutor === selectedTutorFilter)
-    : signups
 
   return (
     <section className="panel admin-layout">
@@ -763,12 +713,9 @@ function AdminPage({ tas }) {
             >
               Messages
             </button>
-            <button
-              className={`tab-btn ${activeTab === 'signups' ? 'active' : ''}`}
-              onClick={() => setActiveTab('signups')}
-            >
-              Signups
-            </button>
+            <Link to="/ta-dashboard" className="btn btn-small" style={{ marginLeft: 'auto' }}>
+              TA Dashboard
+            </Link>
             <button className="btn btn-small logout-btn" type="button" onClick={() => setIsLoggedIn(false)}>
               Logout
             </button>
@@ -842,72 +789,6 @@ function AdminPage({ tas }) {
                     <p>{msg.message || ''}</p>
                   </article>
                 ))}
-              </div>
-            </>
-          )}
-
-          {activeTab === 'signups' && (
-            <>
-              <div className="panel-head">
-                <h2>Signup Dashboard</h2>
-                <button className="btn btn-small" type="button" onClick={loadSignups}>
-                  Refresh
-                </button>
-              </div>
-
-              <label>
-                Filter by tutor
-                <select value={selectedTutorFilter} onChange={(e) => setSelectedTutorFilter(e.target.value)}>
-                  <option value="">All TAs</option>
-                  {TUTORS.map((tutor) => (
-                    <option key={tutor} value={tutor}>
-                      {tutor}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <div className="signup-stats">
-                <div className="stat">
-                  <strong>{filteredSignups.length}</strong>
-                  <span>Total Signups</span>
-                </div>
-              </div>
-
-              <div className="review-list-stack">
-                {filteredSignups.length === 0 ? (
-                  <p className="ta-title">No signups yet.</p>
-                ) : (
-                  filteredSignups
-                    .sort((a, b) => new Date(a.date) - new Date(b.date))
-                    .map((signup) => (
-                      <article className="review-card signup-card" key={signup.id}>
-                        <div className="review-meta">
-                          <div>
-                            <strong>{signup.name}</strong>
-                            <div className="ta-title">
-                              {signup.tutor} · {new Date(signup.date).toLocaleDateString()} at {signup.time}
-                            </div>
-                          </div>
-                          <button
-                            className="btn btn-small btn-delete"
-                            type="button"
-                            onClick={() => deleteSignup(signup.id)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                        <div className="signup-details">
-                          <p>
-                            <strong>Contact:</strong> {signup.isEmail ? '📧' : '📞'} {signup.contact}
-                          </p>
-                          <p>
-                            <strong>Goal:</strong> {signup.goal}
-                          </p>
-                        </div>
-                      </article>
-                    ))
-                )}
               </div>
             </>
           )}
