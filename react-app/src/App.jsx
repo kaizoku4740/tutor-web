@@ -40,6 +40,8 @@ function Layout({ children }) {
   const location = useLocation()
   const clickCount = useRef(0)
   const clickTimer = useRef(null)
+  const taClickCount = useRef(0)
+  const taClickTimer = useRef(null)
 
   function handleAdminTrigger() {
     clickCount.current += 1
@@ -56,6 +58,24 @@ function Layout({ children }) {
 
     clickTimer.current = setTimeout(() => {
       clickCount.current = 0
+    }, 1000)
+  }
+
+  function handleTADashboardTrigger() {
+    taClickCount.current += 1
+
+    if (taClickTimer.current) {
+      clearTimeout(taClickTimer.current)
+    }
+
+    if (taClickCount.current >= 5) {
+      taClickCount.current = 0
+      navigate('/ta-dashboard')
+      return
+    }
+
+    taClickTimer.current = setTimeout(() => {
+      taClickCount.current = 0
     }, 1000)
   }
 
@@ -86,7 +106,13 @@ function Layout({ children }) {
       </main>
 
       <footer className="site-footer panel">
-        <small id="admin-trigger" onClick={handleAdminTrigger}>
+        <small 
+          id="admin-trigger" 
+          onClick={() => {
+            handleAdminTrigger()
+            handleTADashboardTrigger()
+          }}
+        >
           &copy; {new Date().getFullYear()} Math Academy by Mrs Garg
         </small>
       </footer>

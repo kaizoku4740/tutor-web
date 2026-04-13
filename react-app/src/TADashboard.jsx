@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './TADashboard.css';
 
 const TUTORS = [
@@ -13,15 +13,45 @@ export default function TADashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [mouseActive, setMouseActive] = useState(false);
+  const mouseTimerRef = useRef(null);
+  const intervalRef = useRef(null);
 
+  // Track mouse activity to disable auto-refresh when user is actively viewing
+  useEffect(() => {
+    const handleMouseMove = () => {
+      setMouseActive(true);
+      if (mouseTimerRef.current) {
+        clearTimeout(mouseTimerRef.current);
+      }
+      mouseTimerRef.current = setTimeout(() => {
+        setMouseActive(false);
+      }, 5000); // Reset after 5 seconds of no mouse activity
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // Set up auto-refresh, but disable when user is actively looking
   useEffect(() => {
     loadDashboard();
-    const interval = setInterval(loadDashboard, 10000); // Refresh every 10 seconds
-    return () => clearInterval(interval);
-  }, [selectedTutor]);
+    
+    // Only refresh if user is not actively using the dashboard
+    if (!mouseActive) {
+      intervalRef.current = setInterval(() => {
+        loadDashboard();
+      }, 10000); // Refresh every 10 seconds when idle
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [selectedTutor, mouseActive]);
 
   async function loadDashboard() {
-    setLoading(true);
     setError('');
     try {
       const response = await fetch(
@@ -34,11 +64,36 @@ export default function TADashboard() {
 
       const result = await response.json();
       setData(result);
+      setLoading(false);
     } catch (err) {
       console.error('Error:', err);
       setError(err.message);
-    } finally {
       setLoading(false);
+    }
+  }
+
+  async function deleteSignup(signupId) {
+    if (!window.confirm('Are you sure you want to delete this signup?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/signups?id=${signupId}`, {
+        method: 'DELETE',
+        headers: {
+          'X-Admin-Key': 'admin-password-change-me'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete signup');
+      }
+
+      // Refresh the dashboard
+      await loadDashboard();
+    } catch (err) {
+      console.error('Error deleting signup:', err);
+      alert('Failed to delete signup: ' + err.message);
     }
   }
 
@@ -51,18 +106,24 @@ export default function TADashboard() {
       <div className="ta-dashboard-header">
         <h1>📚 TA Dashboard</h1>
         <p>View student signups for your sessions</p>
+        {mouseActive && <div className="refresh-disabled">✓ Auto-refresh paused while viewing</div>}
       </div>
 
-      <div className="tutor-selector">
-        {TUTORS.map(tutor => (
-          <button
-            key={tutor}
-            className={`tutor-btn ${selectedTutor === tutor ? 'active' : ''}`}
-            onClick={() => setSelectedTutor(tutor)}
-          >
-            {tutor}
-          </button>
-        ))}
+      <div className="ta-controls">
+        <div className="tutor-selector">
+          {TUTORS.map(tutor => (
+            <button
+              key={tutor}
+              className={`tutor-btn ${selectedTutor === tutor ? 'active' : ''}`}
+              onClick={() => setSelectedTutor(tutor)}
+            >
+              {tutor}
+            </button>
+          ))}
+        </div>
+        <button className="refresh-btn" onClick={loadDashboard} disabled={loading}>
+          {loading ? '⟳ Refreshing...' : '⟳ Refresh'}
+        </button>
       </div>
 
       {error && <div className="ta-error">{error}</div>}
@@ -108,17 +169,26 @@ export default function TADashboard() {
                     ) : (
                       session.students.map((student, sidx) => (
                         <div key={sidx} className="student-item">
-                          <div>
-                            <div className="student-name">{student.name}</div>
-                          </div>
-                          <div>
-                            <div className="student-contact">
-                              {student.isEmail ? '📧' : '📞'} {student.contact}
+                          <div className="student-info">
+                            <div>
+                              <div className="student-name">{student.name}</div>
+                            </div>
+                            <div>
+                              <div className="student-contact">
+                                {student.isEmail ? '📧' : '📞'} {student.contact}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="student-goal">{student.goal}</div>
                             </div>
                           </div>
-                          <div>
-                            <div className="student-goal">{student.goal}</div>
-                          </div>
+                          <button
+                            className="delete-btn"
+                            onClick={() => deleteSignup(student.id)}
+                            title="Delete this signup"
+                          >
+                            ✕
+                          </button>
                         </div>
                       ))
                     )}
