@@ -164,16 +164,20 @@ export default function SignupPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          form_data: {
-            name: formData.name,
-            email: formData.emailOrPhone,
-            message: `Signup Request:\nTutor: ${selectedSlot.tutor}\nDate: ${selectedDate.toDateString()}\nTime: ${selectedSlot.time}\nGoal: ${formData.goal}`,
-          },
+          name: formData.name,
+          emailOrPhone: formData.emailOrPhone,
+          goal: formData.goal,
+          tutor: selectedSlot.tutor,
+          date: selectedDate.toISOString().split('T')[0],
+          time: selectedSlot.time,
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to submit signup');
+        setError(data.error || data.errors?.[0] || 'Failed to submit signup');
+        return;
       }
 
       // Show success message

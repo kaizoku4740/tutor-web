@@ -1,9 +1,11 @@
 // Cloudflare Pages Function — /api/contact-messages
-// POST stores inbound contact submissions (via FormSubmit webhook).
-// GET returns stored messages for admin panel (requires X-Admin-Key).
+// Handles signup submissions for the math tutoring calendar.
+// POST: Submit new signup
+// GET: Retrieve signups (requires X-Admin-Key)
+// DELETE: Clear all signups (requires X-Admin-Key)
 
-const ADMIN_PASSWORD = 'password';
-const STORAGE_KEY = 'contact-messages';
+const ADMIN_PASSWORD = 'admin-password-change-me';
+const SIGNUPS_KEY = 'math-tutor-signups';
 
 function corsHeaders() {
   return {
@@ -13,45 +15,80 @@ function corsHeaders() {
   };
 }
 
-async function parseBody(request) {
-  // Read raw text first so we can store it for debugging and try multiple formats
-  let rawText = '';
-  try { rawText = await request.text(); } catch (_) {}
-
-  let parsed = {};
-  // Try JSON parse
-  try { parsed = JSON.parse(rawText); } catch (_) {
-    // Try URL-encoded
-    try {
-      const params = new URLSearchParams(rawText);
-      for (const [k, v] of params.entries()) parsed[k] = v;
-    } catch (_) {}
-  }
-  return { parsed, rawText };
+// Email validation regex
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
 
-function normalizeMessage(parsed, rawText) {
-  // FormSubmit sends form_data as a JSON *string* — parse it first
-  let fd = {};
-  try {
-    fd = typeof parsed?.form_data === 'string'
-      ? JSON.parse(parsed.form_data)
-      : (parsed?.form_data || {});
-  } catch (_) {}
-  const name    = String(fd.name    || parsed?.name    || '').trim();
-  const email   = String(fd.email   || parsed?.email   || '').trim();
-  const message = String(fd.message || parsed?.message || '').trim();
+// Phone validation regex (basic - accepts formats like 123-456-7890, (123) 456-7890, etc.)
+function isValidPhone(phone) {
+  const phoneRegex = /^[\d\s\-\(\)\+\.]+$/.test(phone) && phone.replace(/\D/g, '').length >= 10;
+  return phoneRegex;
+}
 
+// Validate signup data
+function validateSignup(data) {
+  const errors = [];
+
+  if (!data.name || data.name.trim().length === 0) {
+    errors.push('Name is required');
+  }
+
+  if (!data.emailOrPhone || data.emailOrPhone.trim().length === 0) {
+    errors.push('Email or phone is required');
+  } else {
+    const contact = data.emailOrPhone.trim();
+    if (!isValidEmail(contact) && !isValidPhone(contact)) {
+      errors.push('Please provide a valid email address or phone number');
+    }
+  }
+
+  if (!data.goal || data.goal.trim().length === 0) {
+    errors.push('Session goal is required');
+  }
+
+  if (!data.tutor || data.tutor.trim().length === 0) {
+    errors.push('Tutor selection is required');
+  }
+
+  if (!data.date || data.date.trim().length === 0) {
+    errors.push('Date selection is required');
+  }
+
+  if (!data.time || data.time.trim().length === 0) {
+    errors.push('Time slot is required');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+// Create a new signup object
+function createSignup(data) {
   return {
-    id: Date.now().toString(),
-    name:    name    || '(none)',
-    email:   email   || '(none)',
-    message: message || '(none)',
-    ts: Date.now(),
-    source: 'formsubmit'
+    id: `signup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    name: data.name.trim(),
+    contact: data.emailOrPhone.trim(),
+    isEmail: isValidEmail(data.emailOrPhone.trim()),
+    goal: data.goal.trim(),
+    tutor: data.tutor.trim(),
+    date: data.date.trim(),
+    time: data.time.trim(),
+    createdAt: new Date().toISOString(),
+    status: 'confirmed'
   };
 }
 
+// Parse JSON body
+async function parseJSONBody(request) {
+  try {
+    return await request.json();
+  } catch (_) {
+    return {};
+  }
+}
+
+// GET: Retrieve all signups (admin only)
 export async function onRequestGet({ request, env }) {
   const adminKey = request.headers.get('X-Admin-Key');
   if (adminKey !== ADMIN_PASSWORD) {
@@ -59,43 +96,106 @@ export async function onRequestGet({ request, env }) {
   }
 
   try {
-    const data = await env.REVIEWS.get(STORAGE_KEY);
-    const messages = data ? JSON.parse(data) : [];
-    return Response.json(messages, { headers: corsHeaders() });
-  } catch (_) {
-    return Response.json({ error: 'Failed to fetch contact messages' }, { status: 500, headers: corsHeaders() });
+    const data = await env.REVIEWS.get(SIGNUPS_KEY);
+    const signups = data ? JSON.parse(data) : [];
+    return Response.json({ success: true, count: signups.length, signups }, { headers: corsHeaders() });
+  } catch (err) {
+    return Response.json({ error: 'Failed to fetch signups' }, { status: 500, headers: corsHeaders() });
   }
 }
 
+// POST: Submit new signup
 export async function onRequestPost({ request, env }) {
+  // Handle CORS preflight
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: corsHeaders() });
+  }
+
   try {
-    const { parsed, rawText } = await parseBody(request);
-    const message = normalizeMessage(parsed, rawText);
+    const body = await parseJSONBody(request);
+    
+    // Validate the signup data
+    const validation = validateSignup(body);
+    if (!validation.valid) {
+      return Response.json(
+        { success: false, errors: validation.errors },
+        { status: 400, headers: corsHeaders() }
+      );
+    }
 
-    const existing = await env.REVIEWS.get(STORAGE_KEY);
-    const messages = existing ? JSON.parse(existing) : [];
-    messages.unshift(message);
+    // Create the signup object
+    const signup = createSignup(body);
 
-    // Keep only the most recent 500 entries to prevent unbounded growth.
-    const boundedMessages = messages.slice(0, 500);
-    await env.REVIEWS.put(STORAGE_KEY, JSON.stringify(boundedMessages));
+    // Retrieve existing signups
+    const existing = await env.REVIEWS.get(SIGNUPS_KEY);
+    const signups = existing ? JSON.parse(existing) : [];
 
-    return Response.json({ success: true }, { status: 201, headers: corsHeaders() });
-  } catch (_) {
-    return Response.json({ error: 'Failed to store contact message' }, { status: 500, headers: corsHeaders() });
+    // Check for duplicate bookings (same tutor, date, and contact)
+    const isDuplicate = signups.some(s => 
+      s.tutor === signup.tutor && 
+      s.date === signup.date && 
+      s.contact === signup.contact
+    );
+
+    if (isDuplicate) {
+      return Response.json(
+        { success: false, error: 'You have already signed up for this time slot' },
+        { status: 409, headers: corsHeaders() }
+      );
+    }
+
+    // Check slot capacity (max 3 per slot)
+    const slotsForTutorDate = signups.filter(s => 
+      s.tutor === signup.tutor && 
+      s.date === signup.date && 
+      s.time === signup.time
+    );
+
+    if (slotsForTutorDate.length >= 3) {
+      return Response.json(
+        { success: false, error: 'This slot is now full. Please select another time.' },
+        { status: 409, headers: corsHeaders() }
+      );
+    }
+
+    // Add new signup
+    signups.unshift(signup);
+
+    // Keep only recent signups (max 1000 entries)
+    const boundedSignups = signups.slice(0, 1000);
+    await env.REVIEWS.put(SIGNUPS_KEY, JSON.stringify(boundedSignups));
+
+    return Response.json(
+      { 
+        success: true, 
+        message: 'Signup confirmed!',
+        signup: {
+          id: signup.id,
+          tutor: signup.tutor,
+          date: signup.date,
+          time: signup.time
+        }
+      },
+      { status: 201, headers: corsHeaders() }
+    );
+  } catch (err) {
+    console.error('Signup error:', err);
+    return Response.json({ error: 'Failed to process signup' }, { status: 500, headers: corsHeaders() });
   }
 }
 
+// DELETE: Clear all signups (admin only)
 export async function onRequestDelete({ request, env }) {
   const adminKey = request.headers.get('X-Admin-Key');
   if (adminKey !== ADMIN_PASSWORD) {
     return Response.json({ error: 'Unauthorized' }, { status: 403, headers: corsHeaders() });
   }
+
   try {
-    await env.REVIEWS.put(STORAGE_KEY, JSON.stringify([]));
-    return Response.json({ success: true }, { headers: corsHeaders() });
-  } catch (_) {
-    return Response.json({ error: 'Failed to clear messages' }, { status: 500, headers: corsHeaders() });
+    await env.REVIEWS.put(SIGNUPS_KEY, JSON.stringify([]));
+    return Response.json({ success: true, message: 'All signups cleared' }, { headers: corsHeaders() });
+  } catch (err) {
+    return Response.json({ error: 'Failed to clear signups' }, { status: 500, headers: corsHeaders() });
   }
 }
 
