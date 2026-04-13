@@ -305,6 +305,13 @@ textarea {
   color: var(--text-muted);
 }
 
+.ta-hours {
+  margin: 0.1rem 0 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
 .chips-wrap {
   display: flex;
   flex-wrap: wrap;
@@ -608,6 +615,24 @@ textarea {
     transform: translateY(0) scale(1);
     filter: blur(0);
   }
+}
+
+.hours-editor {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-top: 0.8rem;
+}
+
+.hours-editor label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.hours-editor input {
+  width: 80px;
 }
 
 @media (max-width: 980px) {

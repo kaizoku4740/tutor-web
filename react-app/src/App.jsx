@@ -315,6 +315,7 @@ function TAsPage({ tas }) {
           <article key={ta.id} className="ta-grid-card">
             <h3>{ta.name}</h3>
             <p className="ta-title">{ta.title}</p>
+            {ta.hours !== undefined && <p className="ta-hours">{ta.hours} hours tutored</p>}
             <p>{ta.bio}</p>
             <div className="spacer-top-sm">
               <Link className="btn btn-small" to={`/reviews/${ta.id}`}>
@@ -596,10 +597,12 @@ function AdminPage({ tas }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [passwordInput, setPasswordInput] = useState('')
   const [loginStatus, setLoginStatus] = useState('')
-  const [activeTab, setActiveTab] = useState('reviews') // 'reviews', 'messages'
+  const [activeTab, setActiveTab] = useState('reviews') // 'reviews', 'messages', 'hours'
   const [filterTa, setFilterTa] = useState('')
   const [allReviews, setAllReviews] = useState({})
   const [messages, setMessages] = useState([])
+  const [taHours, setTaHours] = useState({})
+  const [hoursInput, setHoursInput] = useState({})
 
   async function loadAllReviews() {
     try {
@@ -640,9 +643,39 @@ function AdminPage({ tas }) {
       setPasswordInput('')
       loadAllReviews()
       loadMessages()
+      // Initialize hours from tas data
+      const initialHours = {}
+      tas.forEach((ta) => {
+        initialHours[ta.id] = ta.hours || 0
+        setHoursInput((prev) => ({ ...prev, [ta.id]: ta.hours || 0 }))
+      })
+      setTaHours(initialHours)
       return
     }
     setLoginStatus('Wrong password. Try again.')
+  }
+
+  async function updateHours(taId) {
+    const newHours = hoursInput[taId]
+    if (newHours === undefined || newHours === taHours[taId]) return
+
+    try {
+      const res = await fetch('/api/hours', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': ADMIN_PASSWORD,
+        },
+        body: JSON.stringify({ taId, hours: newHours }),
+      })
+      if (!res.ok) {
+        alert('Failed to update hours')
+        return
+      }
+      setTaHours((prev) => ({ ...prev, [taId]: newHours }))
+    } catch {
+      alert('Error updating hours')
+    }
   }
 
   async function deleteReview(taId, reviewId) {
@@ -712,6 +745,12 @@ function AdminPage({ tas }) {
               onClick={() => setActiveTab('messages')}
             >
               Messages
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'hours' ? 'active' : ''}`}
+              onClick={() => setActiveTab('hours')}
+            >
+              Hours
             </button>
             <Link to="/ta-dashboard" className="btn btn-small" style={{ marginLeft: 'auto' }}>
               TA Dashboard
@@ -792,6 +831,46 @@ function AdminPage({ tas }) {
               </div>
             </>
           )}
+
+          {activeTab === 'hours' && (
+            <>
+              <div className="panel-head">
+                <h2>Tutor Hours</h2>
+              </div>
+              <div className="review-list-stack">
+                {tas.map((ta) => (
+                  <article className="review-card" key={ta.id}>
+                    <div className="review-meta">
+                      <strong>{ta.name}</strong>
+                    </div>
+                    <div className="hours-editor">
+                      <label>
+                        Hours tutored:
+                        <input
+                          type="number"
+                          min="0"
+                          value={hoursInput[ta.id] ?? 0}
+                          onChange={(e) =>
+                            setHoursInput((prev) => ({
+                              ...prev,
+                              [ta.id]: parseInt(e.target.value) || 0,
+                            }))
+                          }
+                        />
+                      </label>
+                      <button
+                        className="btn btn-small"
+                        type="button"
+                        onClick={() => updateHours(ta.id)}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
     </section>
@@ -808,6 +887,26 @@ function App() {
         const res = await fetch('/data/tas.json')
         if (!res.ok) throw new Error('ta data failed')
         const data = await res.json()
+        
+        // Fetch hours from API
+        try {
+          const hoursRes = await fetch('/api/hours')
+          if (hoursRes.ok) {
+            const hoursData = await hoursRes.json()
+            if (hoursData.hours) {
+              // Merge hours into TA data
+              const tasWithHours = data.map((ta) => ({
+                ...ta,
+                hours: hoursData.hours[ta.id] !== undefined ? hoursData.hours[ta.id] : (ta.hours || 0),
+              }))
+              if (!cancelled) setTas(Array.isArray(tasWithHours) ? tasWithHours : [])
+              return
+            }
+          }
+        } catch {
+          // Fall through to use local hours
+        }
+        
         if (!cancelled) setTas(Array.isArray(data) ? data : [])
       } catch {
         if (!cancelled) setTas([])

@@ -6,38 +6,52 @@
     "bio": "Coming soon.",
     "subjects": ["TBD"],
     "experience": "TBD",
-    "isTeacher": true
+    "isTeacher": true,
+    "hours": 0
   },
   {
     "id": "ta1",
-    "name": "Neha",
+    "name": "TA #1",
     "title": "TBD",
     "bio": "Coming soon.",
     "subjects": ["TBD"],
-    "experience": "TBD"
+    "experience": "TBD",
+    "hours": 0
   },
   {
     "id": "ta2",
-    "name": "Nandita",
+    "name": "TA #2",
     "title": "TBD",
     "bio": "Coming soon.",
     "subjects": ["TBD"],
-    "experience": "TBD"
+    "experience": "TBD",
+    "hours": 0
   },
   {
     "id": "ta3",
-    "name": "Samhithaa",
+    "name": "TA #3",
     "title": "TBD",
     "bio": "Coming soon.",
     "subjects": ["TBD"],
-    "experience": "TBD"
+    "experience": "TBD",
+    "hours": 0
   },
   {
     "id": "ta4",
-    "name": "Abhiram",
+    "name": "TA #4",
     "title": "TBD",
     "bio": "Coming soon.",
     "subjects": ["TBD"],
-    "experience": "TBD"
+    "experience": "TBD",
+    "hours": 0
+  },
+  {
+    "id": "ta5",
+    "name": "TA #5",
+    "title": "TBD",
+    "bio": "Coming soon.",
+    "subjects": ["TBD"],
+    "experience": "TBD",
+    "hours": 0
   }
 ]
