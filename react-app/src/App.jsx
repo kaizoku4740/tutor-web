@@ -636,7 +636,9 @@ function AdminPage({ tas }) {
         return
       }
       const data = await res.json()
-      setMessages(Array.isArray(data) ? data : data.signups || [])
+      // The API returns { success: true, count: ..., signups: [...] }
+      // Messages are the old data structure, but we get signups now
+      setMessages(Array.isArray(data) ? data : [])
     } catch {
       setMessages([])
     }
@@ -652,8 +654,10 @@ function AdminPage({ tas }) {
         return
       }
       const data = await res.json()
-      setSignups(Array.isArray(data.signups) ? data.signups : [])
-    } catch {
+      // The API returns { success: true, count: ..., signups: [...] }
+      setSignups(data.signups && Array.isArray(data.signups) ? data.signups : [])
+    } catch (err) {
+      console.error('Error loading signups:', err)
       setSignups([])
     }
   }
