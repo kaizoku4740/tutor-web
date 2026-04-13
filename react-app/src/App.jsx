@@ -603,6 +603,8 @@ function AdminPage({ tas }) {
   const [messages, setMessages] = useState([])
   const [taHours, setTaHours] = useState({})
   const [hoursInput, setHoursInput] = useState({})
+  const [hoursHistory, setHoursHistory] = useState({})
+  const [selectedTaForHistory, setSelectedTaForHistory] = useState('')
 
   async function loadAllReviews() {
     try {
@@ -643,6 +645,7 @@ function AdminPage({ tas }) {
       setPasswordInput('')
       loadAllReviews()
       loadMessages()
+      loadHoursHistory()
       // Initialize hours from tas data
       const initialHours = {}
       tas.forEach((ta) => {
@@ -673,8 +676,28 @@ function AdminPage({ tas }) {
         return
       }
       setTaHours((prev) => ({ ...prev, [taId]: newHours }))
+      // Reload history after update
+      loadHoursHistory()
     } catch {
       alert('Error updating hours')
+    }
+  }
+
+  async function loadHoursHistory() {
+    try {
+      const res = await fetch('/api/hours?history=true', {
+        headers: { 'X-Admin-Key': ADMIN_PASSWORD },
+      })
+      if (!res.ok) {
+        setHoursHistory({})
+        return
+      }
+      const data = await res.json()
+      if (data.history) {
+        setHoursHistory(data.history)
+      }
+    } catch {
+      setHoursHistory({})
     }
   }
 
@@ -868,6 +891,67 @@ function AdminPage({ tas }) {
                     </div>
                   </article>
                 ))}
+              </div>
+
+              <div className="panel-head top-gap">
+                <h2>Hours History</h2>
+              </div>
+
+              <label>
+                Select tutor to view history
+                <select value={selectedTaForHistory} onChange={(e) => setSelectedTaForHistory(e.target.value)}>
+                  <option value="">All TAs</option>
+                  {tas.map((ta) => (
+                    <option key={ta.id} value={ta.id}>
+                      {ta.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="review-list-stack">
+                {selectedTaForHistory ? (
+                  // Show history for selected TA
+                  hoursHistory[selectedTaForHistory] && hoursHistory[selectedTaForHistory].length > 0 ? (
+                    hoursHistory[selectedTaForHistory].map((entry) => (
+                      <article className="review-card" key={entry.date}>
+                        <div className="review-meta">
+                          <div>
+                            <strong>{new Date(entry.date).toLocaleDateString()}</strong>
+                            <div className="ta-title">{entry.hours} hours</div>
+                          </div>
+                        </div>
+                        <p className="ta-title">Updated at {new Date(entry.timestamp).toLocaleTimeString()}</p>
+                      </article>
+                    ))
+                  ) : (
+                    <p className="ta-title">No history found for this tutor.</p>
+                  )
+                ) : (
+                  // Show all history
+                  Object.keys(hoursHistory).length > 0 ? (
+                    Object.keys(hoursHistory).map((taId) => (
+                      <div key={taId}>
+                        <h3>{tas.find((ta) => ta.id === taId)?.name || taId}</h3>
+                        <div className="review-list-stack">
+                          {hoursHistory[taId].map((entry) => (
+                            <article className="review-card" key={`${taId}-${entry.date}`}>
+                              <div className="review-meta">
+                                <div>
+                                  <strong>{new Date(entry.date).toLocaleDateString()}</strong>
+                                  <div className="ta-title">{entry.hours} hours</div>
+                                </div>
+                              </div>
+                              <p className="ta-title">Updated at {new Date(entry.timestamp).toLocaleTimeString()}</p>
+                            </article>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="ta-title">No hours history yet.</p>
+                  )
+                )}
               </div>
             </>
           )}
