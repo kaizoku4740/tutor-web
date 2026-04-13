@@ -59,6 +59,7 @@ const SLOTS = generateSlots(3, 2026); // April 2026 (month is 0-indexed)
 export default function SignupPage() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [slots, setSlots] = useState(SLOTS);
   const [formData, setFormData] = useState({
     name: '',
     emailOrPhone: '',
@@ -70,9 +71,53 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
 
+  // Fetch updated slot counts from the backend
+  const fetchSlotCounts = async () => {
+    try {
+      // Get all signups to update slot counts
+      const response = await fetch('/api/contact-messages', {
+        headers: {
+          'X-Admin-Key': 'admin-password-change-me'
+        }
+      });
+      
+      if (!response.ok) return;
+      
+      const data = await response.json();
+      const signups = data.signups || [];
+      
+      // Count signups per slot
+      const slotCounts = {};
+      signups.forEach(signup => {
+        const slotKey = `${signup.tutor}-${signup.date}-${signup.time}`;
+        slotCounts[slotKey] = (slotCounts[slotKey] || 0) + 1;
+      });
+      
+      // Update slots with new counts
+      const updatedSlots = slots.map(slot => {
+        const slotKey = `${slot.tutor}-${slot.date}-${slot.time}`;
+        return {
+          ...slot,
+          filled: slotCounts[slotKey] || 0
+        };
+      });
+      
+      setSlots(updatedSlots);
+    } catch (err) {
+      console.error('Failed to fetch slot counts:', err);
+    }
+  };
+
+  // Fetch counts on component mount and set up polling
+  React.useEffect(() => {
+    fetchSlotCounts();
+    const interval = setInterval(fetchSlotCounts, 5000); // Refresh every 5 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   const handleDayClick = (date) => {
     const dateString = date.toISOString().split('T')[0];
-    const slotsForDate = SLOTS.filter((slot) => slot.date === dateString);
+    const slotsForDate = slots.filter((slot) => slot.date === dateString);
     if (slotsForDate.length > 0) {
       setSelectedDate(date);
       setSelectedSlot(slotsForDate[0]); // Select the first available slot
@@ -85,7 +130,7 @@ export default function SignupPage() {
   const tileDisabled = ({ date, view }) => {
     if (view === 'month') {
       const dateString = date.toISOString().split('T')[0];
-      return !SLOTS.some((slot) => slot.date === dateString);
+      return !slots.some((slot) => slot.date === dateString);
     }
     return false;
   };
@@ -93,11 +138,11 @@ export default function SignupPage() {
   const tileContent = ({ date, view }) => {
     if (view === 'month') {
       const dateString = date.toISOString().split('T')[0];
-      const slots = SLOTS.filter((slot) => slot.date === dateString);
-      if (slots.length > 0) {
+      const slotsForDate = slots.filter((slot) => slot.date === dateString);
+      if (slotsForDate.length > 0) {
         return (
           <ul className="slot-list">
-            {slots.map((slot) => (
+            {slotsForDate.map((slot) => (
               <li key={slot.id}>
                 {slot.time} - {slot.tutor} ({slot.filled}/{slot.capacity} slots filled)
               </li>
@@ -183,6 +228,9 @@ export default function SignupPage() {
       // Show success message
       setSuccess(true);
       setFormData({ name: '', emailOrPhone: '', goal: '' });
+      
+      // Refresh slot counts immediately
+      await fetchSlotCounts();
       
       // Close form after 3 seconds
       setTimeout(() => {
