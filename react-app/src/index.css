@@ -1,21 +1,21 @@
 :root {
-  --bg-main: #0f172a;
-  --bg-secondary: #1a2847;
-  --bg-tertiary: #243659;
-  --bg-mist: #1e2f4a;
+  --bg-main: #0a0e27;
+  --bg-secondary: #141829;
+  --bg-tertiary: #1f2644;
+  --bg-mist: #17202e;
   --text-main: #ffffff;
-  --text-muted: #cbd5e0;
-  --text-light: #e2e8f0;
-  --border: #334155;
-  --border-soft: #475569;
-  --accent-1: #3b82f6;
-  --accent-2: #8b5cf6;
-  --accent-3: #ec4899;
-  --accent-4: #f59e0b;
-  --accent-2-dark: #6d28d9;
-  --glow-1: rgba(59, 130, 246, 0.2);
-  --glow-2: rgba(139, 92, 246, 0.2);
-  --glow-3: rgba(236, 72, 153, 0.2);
+  --text-muted: #b8c5d6;
+  --text-light: #dde3ed;
+  --border: #2d3a52;
+  --border-soft: #3d4a62;
+  --accent-1: #00d9ff;
+  --accent-2: #ff006e;
+  --accent-3: #ffd60a;
+  --accent-4: #06ffa5;
+  --accent-2-dark: #c2185b;
+  --glow-1: rgba(0, 217, 255, 0.2);
+  --glow-2: rgba(255, 0, 110, 0.2);
+  --glow-3: rgba(255, 214, 10, 0.15);
   --font-body: 'Public Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-title: 'Sora', 'Avenir Next', 'Segoe UI', sans-serif;
 }
@@ -35,10 +35,10 @@ body {
   color: var(--text-main);
   font: 17px/1.5 var(--font-body);
   background: 
-    radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 40% 0%, rgba(236, 72, 153, 0.1) 0%, transparent 40%),
-    linear-gradient(135deg, #0f172a 0%, #1a2847 100%);
+    radial-gradient(circle at 20% 50%, rgba(0, 217, 255, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 0, 110, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 0%, rgba(255, 214, 10, 0.08) 0%, transparent 40%),
+    linear-gradient(135deg, #0a0e27 0%, #141829 100%);
   background-attachment: fixed;
   overflow-x: hidden;
 }
