@@ -32,7 +32,7 @@ function formatDate(ts) {
 
 function stars(rating) {
   const count = Number(rating || 0)
-  return count > 0 ? '*'.repeat(count) : ''
+  return count > 0 ? '★'.repeat(count) : ''
 }
 
 function Layout({ children }) {
@@ -84,7 +84,11 @@ function Layout({ children }) {
       <header className="site-header panel">
         <div className="nav-wrap">
           <Link to="/" className="brand-link">
-            Math Academy by Mrs Garg
+            <span className="brand-mark" aria-hidden="true">M</span>
+            <span className="brand-copy">
+              <strong>Math Academy</strong>
+              <small>by Mrs Garg</small>
+            </span>
           </Link>
           <nav className="main-nav" aria-label="Main navigation">
             <NavLink to="/" end>
@@ -106,8 +110,12 @@ function Layout({ children }) {
       </main>
 
       <footer className="site-footer panel">
-        <small 
-          id="admin-trigger" 
+        <div>
+          <strong>Math Academy</strong>
+          <p>Thoughtful instruction. Confident learners.</p>
+        </div>
+        <small
+          id="admin-trigger"
           onClick={() => {
             handleAdminTrigger()
             handleTADashboardTrigger()
@@ -164,42 +172,46 @@ function HomePage({ tas }) {
   return (
     <div className="page-shell">
       <header className="hero panel">
-        <p className="eyebrow">Mrs Garg Math Academy</p>
-        <h1>
-          Clearer learning.
-          <br />
-          Modern tutoring experience.
-        </h1>
-        <p className="hero-copy">
-          personalized math support with trusted tutors
-        </p>
-        <div className="hero-highlights">
-          <article className="hero-highlight-card">
-            <h3>1:1 Guidance</h3>
-            <p>Focused tutoring sessions tailored to each student.</p>
-          </article>
-          <article className="hero-highlight-card">
-            <h3>Fast Feedback</h3>
-            <p>Regular check-ins to keep progress clear for families.</p>
-          </article>
-          <article className="hero-highlight-card">
-            <h3>Strong Results</h3>
-            <p>Concept-first teaching that builds long-term confidence.</p>
-          </article>
+        <div className="hero-content">
+          <p className="eyebrow">Personalized mathematics tutoring</p>
+          <h1>Where understanding becomes confidence.</h1>
+          <p className="hero-copy">
+            Patient, concept-first instruction that helps students think clearly,
+            solve independently, and feel at home with mathematics.
+          </p>
+          <div className="hero-actions">
+            <Link className="btn btn-primary" to="/signup">
+              Book a session
+            </Link>
+            <Link className="btn btn-ghost" to="/tas">
+              Meet our tutors
+            </Link>
+          </div>
+          <div className="hero-trust">
+            <span>Small-group attention</span>
+            <span>Clear parent updates</span>
+            <span>Concept-led learning</span>
+          </div>
         </div>
-        <div className="hero-actions">
-          <Link className="btn btn-ghost" to="/contact">
-            Contact Us
-          </Link>
+        <div className="hero-visual" aria-hidden="true">
+          <div className="equation-card equation-card-main">
+            <span>Build the foundation</span>
+            <strong>x² + curiosity</strong>
+            <p>Every problem is a chance to understand something new.</p>
+          </div>
+          <div className="equation-orbit orbit-one">π</div>
+          <div className="equation-orbit orbit-two">∑</div>
         </div>
       </header>
 
       <section className="panel info-strip">
         <div className="panel-head">
-          <h2>What This Site Is For</h2>
+          <p className="section-kicker">A better tutoring experience</p>
+          <h2>Everything students need to move forward</h2>
         </div>
         <div className="info-grid">
           <article className="info-card">
+            <span className="card-number">01</span>
             <h3>Find the right tutor</h3>
             <p>
               Browse tutor profiles, check their focus areas, and choose who best matches your
@@ -207,14 +219,16 @@ function HomePage({ tas }) {
             </p>
           </article>
           <article className="info-card">
-            <h3>Read real parent feedback</h3>
+            <span className="card-number">02</span>
+            <h3>Read real family feedback</h3>
             <p>
               Reviews are organized by tutor so you can quickly understand strengths, teaching
               style, and outcomes.
             </p>
           </article>
           <article className="info-card">
-            <h3>Take action quickly</h3>
+            <span className="card-number">03</span>
+            <h3>Book with confidence</h3>
             <p>
               Jump from discovery to contact in one flow without hunting through separate pages.
             </p>
@@ -224,7 +238,10 @@ function HomePage({ tas }) {
 
       <section className="panel" id="home-sections">
         <div className="panel-head">
-          <h2>Select an Instructor</h2>
+          <div>
+            <p className="section-kicker">Our educators</p>
+            <h2>Find your ideal instructor</h2>
+          </div>
           <select value={selectedTa} onChange={(e) => setSelectedTa(e.target.value)}>
             {tas.map((ta) => (
               <option key={ta.id} value={ta.id}>
@@ -315,7 +332,9 @@ function TAsPage({ tas }) {
           <article key={ta.id} className="ta-grid-card">
             <h3>{ta.name}</h3>
             <p className="ta-title">{ta.title}</p>
-            {ta.hours !== undefined && <p className="ta-hours">{ta.hours} hours tutored</p>}
+            {!ta.isTeacher && ta.hours !== undefined && (
+              <p className="ta-hours">{ta.hours} hours tutored</p>
+            )}
             <p>{ta.bio}</p>
             <div className="spacer-top-sm">
               <Link className="btn btn-small" to={`/reviews/${ta.id}`}>

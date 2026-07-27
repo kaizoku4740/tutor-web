@@ -2,10 +2,10 @@
   {
     "id": "teacher",
     "name": "Ms. Garg",
-    "title": "Teacher",
-    "bio": "Coming soon.",
-    "subjects": ["TBD"],
-    "experience": "TBD",
+    "title": "Founder & Lead Instructor",
+    "bio": "Ms. Garg leads the academy and teaches the full mathematics journey—from 7th grade foundations through AP Calculus BC. She also guides students through college applications with thoughtful, personalized support.",
+    "subjects": ["7th Grade Math", "Algebra", "Geometry", "Precalculus", "AP Calculus BC", "College Applications"],
+    "experience": "Lead instructor",
     "isTeacher": true
   },
   {

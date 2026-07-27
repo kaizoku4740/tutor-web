@@ -171,7 +171,7 @@ export default function SignupPage() {
     
     // Validate email or phone format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^[\d\s\-\(\)\+]{10,}$/;
+    const phoneRegex = /^[\d\s()+-]{10,}$/;
     const isValidEmail = emailRegex.test(formData.emailOrPhone.trim());
     const isValidPhone = phoneRegex.test(formData.emailOrPhone.trim());
     

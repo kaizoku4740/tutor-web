@@ -15,7 +15,6 @@ export default function TADashboard() {
   const [error, setError] = useState('');
   const [mouseActive, setMouseActive] = useState(false);
   const mouseTimerRef = useRef(null);
-  const intervalRef = useRef(null);
 
   // Track mouse activity to disable auto-refresh when user is actively viewing
   useEffect(() => {

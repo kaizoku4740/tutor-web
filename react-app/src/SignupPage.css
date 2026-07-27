@@ -1,357 +1,147 @@
-/* SignupPage.css */
+.signup-page {
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--paper);
+}
+
+.signup-page > h1 {
+  margin-bottom: .35rem;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.signup-page > h1::after {
+  content: 'Choose an available date to reserve a focused math session.';
+  display: block;
+  max-width: 620px;
+  margin-top: .7rem;
+  color: var(--ink-soft);
+  font: 400 1rem/1.6 var(--font-body);
+  letter-spacing: 0;
+}
 
 .custom-calendar {
-  margin-top: 20px;
-  width: 98%;
-  max-width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  font-size: 1rem;
-  border: 1px solid rgba(0, 217, 255, 0.3);
-  border-radius: 1.2rem;
-  box-shadow: 
-    0 0 40px rgba(0, 217, 255, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  background: linear-gradient(135deg,
-    rgba(26, 40, 71, 0.6) 0%,
-    rgba(30, 47, 74, 0.4) 100%);
-  backdrop-filter: blur(15px);
-  padding: 20px;
-  overflow: hidden;
-}
-
-/* React Calendar overrides */
-.react-calendar {
-  background: transparent !important;
-  border: none !important;
   width: 100%;
-  font-family: inherit;
-}
-
-.react-calendar__month-view__weekdays {
-  background: rgba(0, 217, 255, 0.1) !important;
-  border-radius: 0.8rem;
-  padding: 0.5rem 0;
-}
-
-.react-calendar__month-view__weekdays__weekday {
-  color: #00d9ff;
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
-  padding: 0.5rem 0;
-}
-
-.react-calendar__month-view__days {
-  background: transparent !important;
-}
-
-.react-calendar__tile {
-  background: rgba(30, 47, 74, 0.4) !important;
-  border: 1px solid rgba(0, 217, 255, 0.15) !important;
-  color: #cbd5e0 !important;
-  padding: 0.8rem 0.5rem;
-  border-radius: 0.6rem;
-  margin: 0.3rem;
-  transition: all 200ms ease !important;
-  cursor: pointer;
-}
-
-.react-calendar__tile:hover {
-  background: rgba(0, 217, 255, 0.2) !important;
-  border-color: rgba(0, 217, 255, 0.5) !important;
-  color: #ffffff !important;
-  transform: translateY(-2px);
-}
-
-.react-calendar__tile--active {
-  background: linear-gradient(135deg, #00d9ff, #ff006e) !important;
-  border-color: rgba(0, 217, 255, 0.8) !important;
-  color: #ffffff !important;
-  box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
-}
-
-.react-calendar__tile--now {
-  background: rgba(255, 0, 110, 0.2) !important;
-  border-color: rgba(255, 0, 110, 0.5) !important;
-  color: #ff6eb4 !important;
+  margin: 2rem auto 0;
+  padding: clamp(.7rem, 2vw, 1.4rem);
+  border: 1px solid var(--line) !important;
+  border-radius: 18px;
+  background: var(--cream) !important;
+  box-shadow: none;
+  font-family: var(--font-body);
 }
 
 .react-calendar__navigation {
-  margin-bottom: 1rem;
-}
-
-.react-calendar__navigation__label {
-  color: #ffffff !important;
-  font-weight: 700;
-  font-size: 1.2rem;
+  display: grid !important;
+  grid-template-columns: auto auto 1fr auto auto;
+  gap: .35rem;
+  height: auto !important;
+  margin-bottom: 1rem !important;
 }
 
 .react-calendar__navigation button {
-  background: rgba(0, 217, 255, 0.15) !important;
-  border: 1px solid rgba(0, 217, 255, 0.3) !important;
-  color: #00d9ff !important;
-  padding: 0.5rem 0.8rem;
-  border-radius: 0.6rem;
-  transition: all 200ms ease;
-  font-weight: 600;
+  min-width: 42px !important;
+  padding: .65rem !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 10px;
+  background: var(--paper) !important;
+  color: var(--navy) !important;
+  font-weight: 700;
 }
 
-.react-calendar__navigation button:hover {
-  background: rgba(0, 217, 255, 0.25) !important;
-  border-color: rgba(0, 217, 255, 0.6) !important;
-  color: #00ffc8 !important;
+.react-calendar__navigation button:hover,
+.react-calendar__navigation button:focus {
+  background: var(--paper-muted) !important;
 }
 
-/* Highlight days with available slots */
-.react-calendar .highlight {
-  background: linear-gradient(135deg, #00d9ff, #ff006e) !important;
-  color: white !important;
-  font-weight: bold;
-  border-radius: 0.6rem;
+.react-calendar__navigation__label { font-family: var(--font-title); font-size: 1.12rem; }
+.react-calendar__month-view__weekdays { color: var(--ink-soft); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; }
+.react-calendar__month-view__weekdays abbr { text-decoration: none; }
+.react-calendar__month-view__weekdays__weekday { padding: .8rem .25rem !important; }
+
+.react-calendar__month-view__days { gap: 5px 0; }
+.react-calendar__tile {
+  min-height: 94px;
+  padding: .55rem .35rem !important;
+  border: 1px solid transparent !important;
+  border-radius: 11px;
+  background: transparent !important;
+  color: var(--ink) !important;
+  transition: .2s ease;
 }
 
-/* Style the slot list inside the calendar */
-.slot-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 0.9rem;
-  color: #cbd5e0;
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  border-color: #d2c3ad !important;
+  background: var(--paper) !important;
 }
 
-/* Modal styling */
-.modal {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
-  z-index: 1000;
+.react-calendar__tile--active {
+  border-color: var(--navy) !important;
+  background: var(--navy) !important;
+  color: #fff !important;
 }
 
-.modal-content {
-  background: linear-gradient(135deg,
-    rgba(26, 40, 71, 0.9) 0%,
-    rgba(30, 47, 74, 0.8) 100%);
-  border: 1px solid rgba(0, 217, 255, 0.3);
-  padding: 2rem;
-  border-radius: 1.2rem;
-  width: 90%;
-  max-width: 500px;
-  text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  color: #ffffff;
-}
+.react-calendar__tile--now { box-shadow: inset 0 0 0 2px var(--gold); }
+.react-calendar__month-view__days__day--neighboringMonth { opacity: .3; }
+.react-calendar__tile:disabled { color: #a7a094 !important; opacity: .45; background: transparent !important; }
 
-.close {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  font-size: 28px;
-  cursor: pointer;
-  color: #cbd5e0;
-  transition: color 200ms ease;
-}
+.slot-list { list-style: none; padding: 0; margin: .35rem 0 0; font-size: .58rem; line-height: 1.3; }
+.slot-list li { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--success); }
+.react-calendar__tile--active .slot-list li { color: #d7ece3; }
 
-.close:hover {
-  color: #ffffff;
-}
-
-/* Signup form styling */
 .signup-form {
-  margin-top: 2rem;
-  padding: 2rem;
-  background: linear-gradient(135deg,
-    rgba(26, 40, 71, 0.6) 0%,
-    rgba(30, 47, 74, 0.4) 100%);
-  border: 1px solid rgba(0, 217, 255, 0.3);
-  border-radius: 1.2rem;
-  width: 90%;
-  max-width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  box-shadow: 
-    0 0 40px rgba(0, 217, 255, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(15px);
-}
-
-.signup-form h2 {
-  margin-bottom: 1.5rem;
-  color: #ffffff;
-  font-size: 1.5rem;
-}
-
-.signup-form label {
-  display: block;
-  margin-bottom: 0.8rem;
-  font-weight: 600;
-  color: #cbd5e0;
-  font-size: 0.95rem;
-}
-
-.signup-form input,
-.signup-form textarea {
   width: 100%;
-  padding: 0.8rem;
-  margin-bottom: 1.2rem;
-  border: 1px solid rgba(0, 217, 255, 0.3);
-  border-radius: 0.8rem;
-  font-size: 1rem;
-  background: rgba(30, 47, 74, 0.5);
-  color: #ffffff;
-  font-family: inherit;
-  transition: all 200ms ease;
+  max-width: 720px;
+  margin: 1.4rem auto 0;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
-.signup-form input::placeholder,
-.signup-form textarea::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
+.form-header { margin-bottom: 1.3rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+.signup-form h2 { margin-bottom: .35rem; font-family: var(--font-title); font-size: 1.55rem; }
+.slot-info { color: var(--ink-soft); font-size: .85rem; }
+.signup-form form { display: grid; gap: .9rem; }
+.signup-form label { display: grid; gap: .4rem; }
+.signup-form input, .signup-form textarea { margin: 0; }
 
-.signup-form input:focus,
-.signup-form textarea:focus {
-  outline: none;
-  border-color: rgba(0, 217, 255, 0.6);
-  background: rgba(30, 47, 74, 0.7);
-  box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
-}
-
-.signup-form button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
+.form-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .5rem; }
+.form-actions button {
+  min-height: 44px;
+  padding: .65rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 700;
   cursor: pointer;
-  font-size: 1rem;
 }
+.form-actions button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.form-actions .btn-submit { flex: 1; min-width: 170px; border-color: var(--navy); background: var(--navy); color: #fff; }
+.form-actions .btn-clear { color: var(--navy); }
+.form-actions .btn-cancel { color: var(--danger); }
+.form-actions button:disabled { opacity: .5; cursor: not-allowed; }
 
-.signup-form button:hover {
-  background-color: #45a049;
-}
+.error-message { margin-bottom: 1rem; padding: .75rem .9rem; border-left: 3px solid var(--danger); border-radius: 8px; background: #f9eaea; color: var(--danger); }
+.field-error { color: var(--danger); font-size: .78rem; }
+.input-error { border-color: var(--danger) !important; background: #fffafa !important; }
+.success-message { padding: 1.2rem; border-radius: 14px; background: #e6f0ea; color: var(--success); text-align: center; }
+.success-message h2 { color: var(--success); }
 
-.signup-form button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
+.fade-enter { opacity: 0; transform: translateY(8px); }
+.fade-enter-active { opacity: 1; transform: none; transition: opacity .35s, transform .35s; }
+.fade-exit { opacity: 1; }
+.fade-exit-active { opacity: 0; transition: opacity .2s; }
 
-/* Form actions container */
-.form-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-}
-
-.btn-submit {
-  background-color: #4CAF50 !important;
-  flex: 1;
-  min-width: 150px;
-}
-
-.btn-submit:hover:not(:disabled) {
-  background-color: #45a049 !important;
-}
-
-.btn-clear {
-  background-color: #2196F3 !important;
-  flex: 0 1 auto;
-}
-
-.btn-clear:hover:not(:disabled) {
-  background-color: #0b7dda !important;
-}
-
-.btn-cancel {
-  background-color: #f44336 !important;
-  flex: 0 1 auto;
-}
-
-.btn-cancel:hover:not(:disabled) {
-  background-color: #da190b !important;
-}
-
-/* Error styling */
-.error-message {
-  background-color: #ffebee;
-  color: #c62828;
-  padding: 12px;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  border-left: 4px solid #c62828;
-}
-
-.field-error {
-  color: #d32f2f;
-  font-size: 0.85rem;
-  display: block;
-  margin-top: 4px;
-}
-
-.input-error {
-  border-color: #d32f2f !important;
-  background-color: #ffebee !important;
-}
-
-/* Success message */
-.success-message {
-  text-align: center;
-  padding: 30px 20px;
-  background: linear-gradient(135deg, #4CAF50, #45a049);
-  color: white;
-  border-radius: 8px;
-}
-
-.success-message h2 {
-  font-size: 1.8rem;
-  margin-bottom: 15px;
-  color: white;
-}
-
-.success-message p {
-  font-size: 1rem;
-  margin: 10px 0;
-  line-height: 1.5;
-}
-
-/* Slot info */
-.slot-info {
-  font-size: 0.9rem;
-  color: #666;
-  margin-top: 8px;
-}
-
-.form-header {
-  margin-bottom: 20px;
-}
-
-/* Added fade-in and fade-out animations for transitions */
-.fade-enter {
-  opacity: 0;
-  transform: scale(0.9);
-}
-
-.fade-enter-active {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 500ms, transform 500ms;
-}
-
-.fade-exit {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.fade-exit-active {
-  opacity: 0;
-  transform: scale(0.9);
-  transition: opacity 300ms, transform 300ms;
+@media (max-width: 680px) {
+  .signup-page { padding: 1.25rem .7rem; }
+  .signup-page > h1, .signup-page > h1::after { margin-left: .55rem; margin-right: .55rem; }
+  .react-calendar__tile { min-height: 68px; font-size: .75rem; }
+  .slot-list { display: none; }
+  .react-calendar__navigation { grid-template-columns: auto 1fr auto; }
+  .react-calendar__navigation__prev2-button,
+  .react-calendar__navigation__next2-button { display: none; }
 }

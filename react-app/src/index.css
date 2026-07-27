@@ -1,61 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
+
 :root {
-  --bg-main: #0a0e27;
-  --bg-secondary: #141829;
-  --bg-tertiary: #1f2644;
-  --bg-mist: #17202e;
-  --text-main: #ffffff;
-  --text-muted: #b8c5d6;
-  --text-light: #dde3ed;
-  --border: #2d3a52;
-  --border-soft: #3d4a62;
-  --accent-1: #00d9ff;
-  --accent-2: #ff006e;
-  --accent-3: #ffd60a;
-  --accent-4: #06ffa5;
-  --accent-2-dark: #c2185b;
-  --glow-1: rgba(0, 217, 255, 0.2);
-  --glow-2: rgba(255, 0, 110, 0.2);
-  --glow-3: rgba(255, 214, 10, 0.15);
-  --font-body: 'Public Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-title: 'Sora', 'Avenir Next', 'Segoe UI', sans-serif;
+  --ink: #13233a;
+  --ink-soft: #465469;
+  --navy: #153b50;
+  --navy-deep: #0e2b3b;
+  --cream: #f7f3eb;
+  --paper: #fffdf9;
+  --paper-muted: #efe9de;
+  --gold: #c88934;
+  --gold-soft: #f3dfbe;
+  --sage: #dce5dc;
+  --line: #ddd6ca;
+  --danger: #a13d3d;
+  --success: #2f6b52;
+  --shadow-sm: 0 8px 24px rgba(19, 35, 58, 0.07);
+  --shadow-lg: 0 24px 70px rgba(19, 35, 58, 0.13);
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-title: 'Fraunces', Georgia, serif;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html,
-body,
-#root {
-  min-height: 100%;
-}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+html, body, #root { min-height: 100%; }
 
 body {
   margin: 0;
-  color: var(--text-main);
-  font: 17px/1.5 var(--font-body);
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(0, 217, 255, 0.12) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(255, 0, 110, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 0%, rgba(255, 214, 10, 0.08) 0%, transparent 40%),
-    linear-gradient(135deg, #0a0e27 0%, #141829 100%);
-  background-attachment: fixed;
-  overflow-x: hidden;
+  color: var(--ink);
+  font: 16px/1.65 var(--font-body);
+  background:
+    radial-gradient(circle at 4% 12%, rgba(200, 137, 52, 0.08), transparent 25rem),
+    var(--cream);
+  -webkit-font-smoothing: antialiased;
 }
+
+button, input, textarea, select { font: inherit; }
+a { color: inherit; }
+h1, h2, h3 { margin: 0; line-height: 1.15; }
+h1, h2 { font-family: var(--font-title); }
+p { margin: 0; }
 
 #root {
-  width: min(1120px, calc(100% - 1.8rem));
+  width: min(1240px, calc(100% - 2rem));
   margin: 0 auto;
-  padding: 1rem 0 2rem;
 }
 
-h1,
-h2,
-h3 {
-  letter-spacing: -0.01em;
-  margin: 0;
-}
+::selection { background: var(--gold-soft); color: var(--ink); }
 
-p {
-  margin: 0;
+@media (max-width: 600px) {
+  #root { width: min(100% - 1rem, 1240px); }
 }
